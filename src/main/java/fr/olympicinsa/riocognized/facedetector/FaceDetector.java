@@ -81,7 +81,7 @@ public class FaceDetector {
 
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
-        
+
         //Frame recognized athlete faces
         for (Rect rect : faceDetections.toArray()) {
             Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
@@ -93,7 +93,7 @@ public class FaceDetector {
 
         return detected;
     }
-    
+
     /**
      * Detected faces present in Mat image, and return bufferedImage.
      *
@@ -107,7 +107,7 @@ public class FaceDetector {
 
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
-        
+
         //Frame recognized athlete faces
         for (Rect rect : faceDetections.toArray()) {
             Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
@@ -117,7 +117,7 @@ public class FaceDetector {
         //Write new bufferedImage
         return openCV.matToBufferedImage(image);
     }
-    
+
     /**
      * Detected faces present in Mat image, and return crop image
      *
@@ -131,14 +131,17 @@ public class FaceDetector {
 
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
-      
-        Rect rect = faceDetections.toArray()[0];
-        Rect rectCrop = new Rect(rect.x,rect.y,rect.width, rect.height);
-        Mat cropImage = new Mat(image, rectCrop);
-        //Write new bufferedImage
-        return openCV.matToBufferedImage(cropImage);
+        if (faceDetections.toArray().length > 0) {
+            Rect rect = faceDetections.toArray()[0];
+            Rect rectCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
+            Mat cropImage = new Mat(image, rectCrop);
+            //Write new bufferedImage
+            return openCV.matToBufferedImage(cropImage);
+        } else {
+            return null;
+        }
     }
-    
+
     /**
      * Detected faces present in Mat image, and return Mat crop image
      *
@@ -152,14 +155,16 @@ public class FaceDetector {
 
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
-      
-        Rect rect = faceDetections.toArray()[0];
-        Rect rectCrop = new Rect(rect.x,rect.y,rect.width, rect.height);
-        Mat cropImage = new Mat(image, rectCrop);
-        
-        return cropImage;
+        if (detected > 0) {
+            Rect rect = faceDetections.toArray()[0];
+            Rect rectCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
+            Mat cropImage = new Mat(image, rectCrop);
+            return cropImage;
+        } else {
+            return null;
+        }
     }
-    
+
     /**
      * detectedFaces getter
      *
