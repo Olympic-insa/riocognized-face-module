@@ -62,11 +62,14 @@ public class Riocognized {
             try {
                 int detected = faceDetector.detectFaces(athletePath, output);
                 System.out.println("Detected " + detected + " athletes !");
-                // Highgui.imwrite("/opt/openCV/face_" + dateString + ".png", Matimage);
+                //crop face
+                Mat crop = faceDetector.cropFaceToMat(image);
+                Highgui.imwrite("/opt/openCV/face_" + dateString + ".jpg", crop);
 
             } catch (Exception e) {
                 System.out.println("Error processiong detection");
             }
+            
         } catch (Exception e) {
             e.printStackTrace();
         }

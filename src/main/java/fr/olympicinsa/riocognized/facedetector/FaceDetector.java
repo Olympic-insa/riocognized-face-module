@@ -5,7 +5,6 @@ import static java.lang.System.exit;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
-import org.opencv.core.Rect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -137,7 +136,7 @@ public class FaceDetector {
             Rect rectCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
             Mat cropImage = new Mat(image, rectCrop);
             //Write new bufferedImage
-            return openCV.matToBufferedImage(cropImage);
+            return ImageConvertor.matToBufferedImage(cropImage);
         } else {
             return null;
         }
