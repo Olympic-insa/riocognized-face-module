@@ -8,6 +8,7 @@ package fr.olympicinsa.riocognized.facedetector.csv;
 import au.com.bytecode.opencsv.CSVReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,8 +19,16 @@ public class FaceDBReader {
     
     private List faces;
     
+    public FaceDBReader() {
+        faces = new ArrayList<String>();
+    }
+    
+    public FaceDBReader(String faceDB) {
+        faces = new ArrayList<String>();
+        faces = readFile(faceDB);
+    }
 
-    public static List readFile(String File) throws IOException {
+    public static List readFile(String File) {
 
         try {
             FileReader fileReader = new FileReader(File);
