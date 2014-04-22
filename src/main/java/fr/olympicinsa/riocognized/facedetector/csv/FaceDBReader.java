@@ -23,10 +23,16 @@ public class FaceDBReader {
     private static String pathDB;
     private List faces;
 
+
     public FaceDBReader() {
         faces = new ArrayList<String>();
     }
 
+    /**
+     * FaceDBReader Constructor
+     * 
+     * @param faceDB String of path to csv file
+     */
     public FaceDBReader(String faceDB) {
         pathDB = faceDB;
         faces = new ArrayList<String>();
@@ -39,6 +45,12 @@ public class FaceDBReader {
         }
     }
 
+    /**
+     * Read line form csv file
+     * 
+     * @param file
+     * @return List of String[] containing face info 
+     */
     public static List readFile(String file) {
 
         try {
@@ -52,6 +64,9 @@ public class FaceDBReader {
         }
     }
 
+    /**
+     * Write csv file with faceDB list to pathDB
+     */
     public void writeFile() {
         try {
             CSVWriter writer = new CSVWriter(new FileWriter(pathDB), ';');
@@ -62,22 +77,44 @@ public class FaceDBReader {
         }
     }
 
+    /**
+     *
+     * @return List of faces
+     */
     public List<String[]> getFaces() {
         return this.faces;
     }
 
+    /**
+     * Set faces list
+     * 
+     * @param faces List of faces
+     */
     public void setList(List<String[]> faces) {
         this.faces = faces;
     }
 
+    /**
+     * Add face to faceDB list
+     * 
+     * @param face String[] w/h athlete face {path, id}
+     */
     public void addFace(String[] face) {
         this.faces.add(face);
     }
 
+    /**
+     * Delete athletes face from faceDB list
+     * 
+     * @param face String[] of athlete face {path, id}
+     */
     public void deleteFace(String[] face) {
         this.faces.remove(face);
     }
 
+    /**
+     * Clear facdDB list
+     */
     public void clearFaces() {
         this.faces.clear();
     }
