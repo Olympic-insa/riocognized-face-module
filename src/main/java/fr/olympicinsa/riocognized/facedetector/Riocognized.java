@@ -1,17 +1,19 @@
 package fr.olympicinsa.riocognized.facedetector;
 
+import static fr.olympicinsa.riocognized.facedetector.ImageConvertor.MatTobyteArray;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.opencv.core.Mat;
+import org.opencv.highgui.Highgui;
 
 public class Riocognized {
 
     public static void main(String[] args) {
-        DateFormat dateFormat = new SimpleDateFormat("hhmmss-dd-MM-yy");
+       DateFormat dateFormat = new SimpleDateFormat("hhmmss-dd-MM-yy");
         Date date = new Date();
         String dateString = dateFormat.format(date);
-
-        String haarCascade;
+        Mat image;
         String athletePath;
 
         //System.load("/opt/openCV/libopencv_java248.so");
@@ -25,16 +27,29 @@ public class Riocognized {
             System.err.println("Couldn't load your athlete picture, use London Olympic's Triathlon podium instead ;-)");
             athletePath = "/opt/openCV/image.jpg";
         }
-        
-        String output = "/opt/openCV/athletes_detected_" + dateString + ".png";
-        System.out.println("Result will be written in : " + output + " ....");
 
         try {
             FaceDetector faceDetector = new FaceDetector();
-            int detected = faceDetector.detectFaces(athletePath, output);
-            System.out.println("Detected " + detected + " athletes !");
+            image = Highgui.imread(athletePath);
+            byte[] Bimage = MatTobyteArray(image); 
+            
+            System.out.println(Bimage[1]);
+            
+         
+
+            String output = "/opt/openCV/athletes_detected_" + dateString + ".png";
+            System.out.println("Result will be written in : " + output + " ....");
+
+            try {
+                int detected = faceDetector.detectFaces(athletePath, output);
+                System.out.println("Detected " + detected + " athletes !");
+                // Highgui.imwrite("/opt/openCV/face_" + dateString + ".png", Matimage);
+              
+            } catch (Exception e) {
+                System.out.println("Error processiong detection");
+            }
         } catch (Exception e) {
-            System.out.println("Error processiong detection");
+            e.printStackTrace();
         }
     }
 }

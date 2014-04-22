@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package fr.olympicinsa.riocognized.facedetector;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import org.opencv.core.CvType;
@@ -16,14 +18,15 @@ import org.opencv.core.Mat;
  *
  * @author imane
  */
-public class ImageConvertor { 
-        /**
+public class ImageConvertor {
+
+    /**
      * Converts/writes a Mat into a BufferedImage.
      *
      * @param matrix Mat of type CV_8UC3 or CV_8UC1
      * @return BufferedImage of type TYPE_3BYTE_BGR or TYPE_BYTE_GRAY
      */
-    public BufferedImage matToBufferedImage(Mat matrix) {
+    public static BufferedImage matToBufferedImage(Mat matrix) {
         int cols = matrix.cols();
         int rows = matrix.rows();
         int elemSize = (int) matrix.elemSize();
@@ -62,46 +65,59 @@ public class ImageConvertor {
     /**
      * Converts/writes a BufferedImage into a Mat.
      *
-     * @param im BufferedImage of type TYPE_3BYTE_BGR 
-     * @return image Mat of type CV_8UC3 
+     * @param image BufferedImage of type TYPE_3BYTE_BGR
+     * @return image Mat of type CV_8UC3
      */
-     public Mat BufferedImagetoMat(BufferedImage im) {
-        // Convert INT to BYTE
-         im = new BufferedImage(im.getWidth(), im.getHeight(),BufferedImage.TYPE_3BYTE_BGR);
-        // Convert bufferedimage to byte array
-         byte[] pixels = ((DataBufferByte) im.getRaster().getDataBuffer()).getData();
-        // Create a Matrix the same size of image
-        Mat image = new Mat(im.getHeight(), im.getWidth(), CvType.CV_8UC3);
-        // Fill Matrix with image values
-        image.put(0, 0, pixels);
+     public static Mat BufferedImagetoMat(BufferedImage image) {
+        int rows = image.getWidth();
+        int cols = image.getHeight();
+        byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        Mat mat = new Mat(cols, rows, CvType.CV_8UC3);
+        mat.put(0, 0, data);
+        return mat;
+    }
+   
 
-        return image;
-    }
-     
-     /**
+    /**
      * Converts a byteArray into a Mat.
+     *
      * @param byteImage byteImage of type byteArray
-     * @return matImage Mat of type CV_8UC3 
+     * @return matImage Mat of type CV_8UC3
      */
-     public Mat byteArrayToMat(byte[] byteImage) {
+    public static Mat byteArrayToMat(byte[] byteImage) throws IOException {
         ByteArrayInputStream in = new ByteArrayInputStream(byteImage);
-        BufferedImage bImage = ImageIO.read(in);
-        Mat matImage = BufferedImagetoMat(bImage);
-        return matImage;
+        try {
+            BufferedImage bImage = ImageIO.read(in);
+            Mat matImage = BufferedImagetoMat(bImage);
+            return matImage;
+        } catch (IOException e) {
+            e.printStackTrace();
+            
+        }
+        return null;
     }
-     
-      /**
+
+    /**
      * Converts a Mat into a byteArray.
-     * @param matImage Mat of type CV_8UC3 
+     *
+     * @param matImage Mat of type CV_8UC3
      * @return byteImage byteImage of type byteArray
-     
      */
-     public byte[] MatTobyteArray(Mat matImage) {
+    public static byte[] MatTobyteArray(Mat matImage) {
         BufferedImage bImage = matToBufferedImage(matImage);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ImageIO.write(bImage,out);
+        try {
+            ImageIO.write(bImage, "Buffered", out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         byte[] byteImage = out.toByteArray();
-        out.close();
+        try {
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return byteImage;
     }
 
