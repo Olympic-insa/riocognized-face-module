@@ -104,21 +104,19 @@ public class ImageConvertor {
      * @return byteImage byteImage of type byteArray
      */
     public static byte[] MatTobyteArray(Mat matImage) {
+        byte[] imageInByte = null;
         BufferedImage bImage = matToBufferedImage(matImage);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            ImageIO.write(bImage, "Buffered", out);
+        ImageIO.write( bImage, "jpg", baos);
+        baos.flush();
+        imageInByte = baos.toByteArray();
+        baos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        byte[] byteImage = out.toByteArray();
-        try {
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return byteImage;
+        return imageInByte;
+        
     }
 
 }
