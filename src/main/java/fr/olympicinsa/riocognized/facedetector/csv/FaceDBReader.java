@@ -15,8 +15,11 @@ import java.util.List;
  * @author alex
  */
 public class FaceDBReader {
+    
+    private List faces;
+    
 
-    public static List<String> readFile(String File) throws IOException {
+    public static List readFile(String File) throws IOException {
 
         try {
             FileReader fileReader = new FileReader(File);
@@ -27,6 +30,26 @@ public class FaceDBReader {
         } catch (IOException e) {
             return null;
         }
+    }
+    
+    public List<String[]> getFaces() {
+        return this.faces;
+    }
+    
+    public void setList(List<String[]> faces) {
+        this.faces = faces;
+    }
+    
+    public void addFace(String[] face) {
+        this.faces.add(face);
+    }
+    
+    public void deleteFace(String[] face) {
+        this.faces.remove(face);
+    }
+    
+    public void clearFaces() {
+        this.faces.clear();
     }
 
 }
