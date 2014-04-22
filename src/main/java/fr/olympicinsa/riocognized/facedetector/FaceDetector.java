@@ -12,6 +12,7 @@ import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 import org.opencv.objdetect.CascadeClassifier;
 
+
 public class FaceDetector {
 
     public final static String CASCADE_RIGHT_EAR = "haarcascade_mcs_rightear.xml";
@@ -115,7 +116,7 @@ public class FaceDetector {
         }
 
         //Write new bufferedImage
-        return openCV.matToBufferedImage(image);
+        return ImageConvertor.matToBufferedImage(image);
     }
 
     /**
