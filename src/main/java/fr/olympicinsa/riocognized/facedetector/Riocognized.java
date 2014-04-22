@@ -1,11 +1,14 @@
 package fr.olympicinsa.riocognized.facedetector;
 
+import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.imageio.ImageIO;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
@@ -30,7 +33,20 @@ public class Riocognized {
             System.err.println("Couldn't load your athlete picture, use London Olympic's Triathlon podium instead ;-)");
             athletePath = "/opt/openCV/image.jpg";
         }
-
+        //Test FaceDBReader
+        FaceDBReader faceDB = new FaceDBReader("/opt/openCV/faces.csv");
+        for (String [] faces :faceDB.getFaces()) {
+            System.out.println(faces[0]+";"+faces[1]);
+        }
+        List<String[]> data = new ArrayList<>();
+        data.add(new String[]{"India", "New Delhi"});
+        data.add(new String[]{"United States", "Washington D.C"});
+        data.add(new String[]{"Germany", "Berlin"});
+        faceDB.setList(data);
+        faceDB.addFace(new String[]{"Germany", "Berlin"});
+        faceDB.writeFile();
+        System.out.println("Test FaceDB OK !");
+        
         try {
             FaceDetector faceDetector = new FaceDetector();
             image = Highgui.imread(athletePath);
@@ -69,7 +85,7 @@ public class Riocognized {
             } catch (Exception e) {
                 System.out.println("Error processiong detection");
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
