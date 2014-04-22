@@ -5,6 +5,7 @@ import static java.lang.System.exit;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Rect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -116,7 +117,49 @@ public class FaceDetector {
         //Write new bufferedImage
         return openCV.matToBufferedImage(image);
     }
+    
+    /**
+     * Detected faces present in Mat image, and return crop image
+     *
+     * @param image Mat of type CV_8UC3 or CV_8UC1
+     * @return BufferedImage of crop face
+     */
+    public BufferedImage cropFaceToBufferedImage(Mat image) {
 
+        MatOfRect faceDetections = new MatOfRect();
+        haarFilter.detectMultiScale(image, faceDetections);
+
+        int detected = faceDetections.toArray().length;
+        this.facesDetected = detected;
+      
+        Rect rect = faceDetections.toArray()[0];
+        Rect rectCrop = new Rect(rect.x,rect.y,rect.width, rect.height);
+        Mat cropImage = new Mat(image, rectCrop);
+        //Write new bufferedImage
+        return openCV.matToBufferedImage(cropImage);
+    }
+    
+    /**
+     * Detected faces present in Mat image, and return Mat crop image
+     *
+     * @param image Mat of type CV_8UC3 or CV_8UC1
+     * @return Mat of detected face
+     */
+    public Mat cropFaceToMat(Mat image) {
+
+        MatOfRect faceDetections = new MatOfRect();
+        haarFilter.detectMultiScale(image, faceDetections);
+
+        int detected = faceDetections.toArray().length;
+        this.facesDetected = detected;
+      
+        Rect rect = faceDetections.toArray()[0];
+        Rect rectCrop = new Rect(rect.x,rect.y,rect.width, rect.height);
+        Mat cropImage = new Mat(image, rectCrop);
+        
+        return cropImage;
+    }
+    
     /**
      * detectedFaces getter
      *
