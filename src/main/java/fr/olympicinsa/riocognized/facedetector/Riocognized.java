@@ -1,7 +1,5 @@
 package fr.olympicinsa.riocognized.facedetector;
 
-import static fr.olympicinsa.riocognized.facedetector.ImageConvertor.MatTobyteArray;
-import static fr.olympicinsa.riocognized.facedetector.ImageConvertor.matToBufferedImage;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -36,18 +34,28 @@ public class Riocognized {
         try {
             FaceDetector faceDetector = new FaceDetector();
             image = Highgui.imread(athletePath);
-            BufferedImage bimage = matToBufferedImage(image);
+
+            //Test Mat to BufferedImage
+            BufferedImage bimage = ImageConvertor.matToBufferedImage(image);
             File outputfile = new File("/opt/openCV/image_matToBuff.jpg");
             ImageIO.write(bimage, "jpg", outputfile);
             System.out.println("Mat to Buffered Image works !");
-            
-            byte[] Bimage = MatTobyteArray(image);
+
+            //Test Mat to Byte
+            byte[] Bimage = ImageConvertor.matTobyteArray(image);
             ByteArrayInputStream bis = new ByteArrayInputStream(Bimage);
             BufferedImage imageFull = ImageIO.read(bis);
             outputfile = new File("/opt/openCV/image_matToByte.jpg");
             ImageIO.write(imageFull, "jpg", outputfile);
             System.out.println("Mat to Byte works !");
 
+            //Test Byte to Mat
+            String outputBM = "/opt/openCV/image_byteToMat.jpg";
+            Mat mat = ImageConvertor.byteArrayToMat(Bimage);
+            Highgui.imwrite(outputBM, image);
+            System.out.println("Byte to Mat works !");
+
+            //Test Face Detection
             String output = "/opt/open CV/athletes_detected_" + dateString + ".jpg";
             System.out.println("Result will be written in : " + output + " ....");
 

@@ -66,9 +66,9 @@ public class ImageConvertor {
      * Converts/writes a BufferedImage into a Mat.
      *
      * @param image BufferedImage of type TYPE_3BYTE_BGR
-     * @return image Mat of type CV_8UC3
+     * @return Mat image of type CV_8UC3
      */
-     public static Mat BufferedImagetoMat(BufferedImage image) {
+    public static Mat bufferedImagetoMat(BufferedImage image) {
         int rows = image.getWidth();
         int cols = image.getHeight();
         byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
@@ -76,23 +76,22 @@ public class ImageConvertor {
         mat.put(0, 0, data);
         return mat;
     }
-   
 
     /**
      * Converts a byteArray into a Mat.
      *
-     * @param byteImage byteImage of type byteArray
-     * @return matImage Mat of type CV_8UC3
+     * @param byteImage byte[] containing image
+     * @return Mat matImage of type CV_8UC3
      */
     public static Mat byteArrayToMat(byte[] byteImage) throws IOException {
         ByteArrayInputStream in = new ByteArrayInputStream(byteImage);
         try {
             BufferedImage bImage = ImageIO.read(in);
-            Mat matImage = BufferedImagetoMat(bImage);
+            Mat matImage = bufferedImagetoMat(bImage);
             return matImage;
         } catch (IOException e) {
+            System.err.println("Can't convert byteArray to Mat");
             e.printStackTrace();
-            
         }
         return null;
     }
@@ -101,22 +100,22 @@ public class ImageConvertor {
      * Converts a Mat into a byteArray.
      *
      * @param matImage Mat of type CV_8UC3
-     * @return byteImage byteImage of type byteArray
+     * @return byte[] byteImage
      */
-    public static byte[] MatTobyteArray(Mat matImage) {
+    public static byte[] matTobyteArray(Mat matImage) {
         byte[] imageInByte = null;
         BufferedImage bImage = matToBufferedImage(matImage);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-        ImageIO.write( bImage, "jpg", baos);
-        baos.flush();
-        imageInByte = baos.toByteArray();
-        baos.close();
+            ImageIO.write(bImage, "jpg", baos);
+            baos.flush();
+            imageInByte = baos.toByteArray();
+            baos.close();
         } catch (IOException e) {
+            System.err.println("Can't convert Mat to byteArray");
             e.printStackTrace();
         }
         return imageInByte;
-        
     }
 
 }
