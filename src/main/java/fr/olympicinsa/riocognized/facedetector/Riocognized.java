@@ -64,20 +64,24 @@ public class Riocognized {
         
         // Test RioRecognizer
         String path = "/opt/openCV/test.yml";
-        faceDB = new FaceDBReader("/opt/openCV/athleteDB/faces.csv");
+        //Load faceDB
+        faceDB = new FaceDBReader("/opt/openCV/testDB/faces.csv");
+        //Create  Recognizor
         RioRecognizer recognizor = new RioRecognizer(faceDB, path);
+        //Store faces
         recognizor.init();
         recognizor.train();
         recognizor.save();
         
-        IplImage toTest = cvLoadImage("/opt/openCV/athleteDB/13/face1.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+        IplImage toTest = cvLoadImage("/opt/openCV/testDB/s12/3.pgm",CV_LOAD_IMAGE_GRAYSCALE);
+        
+        /* Write just grayscaled  loaded test image 
         BufferedImage write = toTest.getBufferedImage();
         try {
             ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl.jpg"));
-        } catch (IOException e) {
-            
+        } catch (IOException e)            
         }
-        //Mat toTest = Highgui.imread("/opt/openCV/athleteDB/13/face0.jpg");
+        */    
         int athlete = recognizor.predictedLabel(toTest);
         System.out.println("Athlete recognized : "+ athlete);
         

@@ -35,8 +35,8 @@ public class RioRecognizer {
 
     public static Logger LOGGER = Logger.getLogger(Riocognized.class);
 
-    private final double THREASHOLD = 100.0;
-    private final int EIGEN_SIZE = 50;
+    private final double THREASHOLD = 5.0;
+    private final int EIGEN_SIZE = 10;
     
     private final FaceDBReader faceDatabase;
     private final FaceRecognizer eigenRecognizer;
