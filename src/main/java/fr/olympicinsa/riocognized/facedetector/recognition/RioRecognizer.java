@@ -85,6 +85,7 @@ public class RioRecognizer {
     }
     
     public void train() {
+        if (imagesDB.size() < 1) init();
         eigenRecognizer.train(imagesDB, athletes);
     }
     
@@ -112,8 +113,8 @@ public class RioRecognizer {
         LOGGER.info("Face Recognizer saved to" + savePath);
     }
     
-    public void load() {
-        eigenRecognizer.load(savePath);
+    public void load(String path) {
+        eigenRecognizer.load(path);
         LOGGER.info("Face Recognizer loaded from " + savePath);
     }
 

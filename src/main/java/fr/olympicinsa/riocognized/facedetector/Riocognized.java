@@ -1,6 +1,7 @@
 package fr.olympicinsa.riocognized.facedetector;
 
 import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -46,6 +47,19 @@ public class Riocognized {
         faceDB.addFace(new String[]{"Germany", "Berlin"});
         faceDB.writeFile();
         System.out.println("Test FaceDB OK !");
+        
+        
+        // Test RioRecognizer
+        String path = "/opt/openCV/test.yml";
+        faceDB = new FaceDBReader("opt/openCV/testDB/faces.csv");
+        RioRecognizer recognizor = new RioRecognizer(faceDB, path);
+        recognizor.init();
+        recognizor.train();
+        recognizor.save();
+        recognizor = null;
+        recognizor = new RioRecognizer(faceDB, "/opt/openCV/test2.yml");
+        recognizor.load(path);
+        recognizor.save();
         
         try {
             FaceDetector faceDetector = new FaceDetector();
