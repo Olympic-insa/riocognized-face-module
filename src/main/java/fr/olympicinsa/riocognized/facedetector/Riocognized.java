@@ -70,7 +70,7 @@ public class Riocognized {
         recognizor.train();
         recognizor.save();
         
-        IplImage toTest = cvLoadImage("/opt/openCV/athleteDB/13/face0.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+        IplImage toTest = cvLoadImage("/opt/openCV/athleteDB/13/face1.jpg",CV_LOAD_IMAGE_GRAYSCALE);
         BufferedImage write = toTest.getBufferedImage();
         try {
             ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl.jpg"));

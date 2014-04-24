@@ -7,36 +7,24 @@ package fr.olympicinsa.riocognized.facedetector.recognition;
 
 import com.googlecode.javacv.cpp.opencv_contrib.FaceRecognizer;
 import static com.googlecode.javacv.cpp.opencv_contrib.createEigenFaceRecognizer;
-import com.googlecode.javacv.cpp.opencv_core.CvPoint;
 import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.MatVector;
 import static com.googlecode.javacv.cpp.opencv_core.cvConvertScale;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateImage;
-import static com.googlecode.javacv.cpp.opencv_core.cvMinMaxLoc;
 import static com.googlecode.javacv.cpp.opencv_core.cvSize;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
-import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_AREA;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvEqualizeHist;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date;
 import fr.olympicinsa.riocognized.facedetector.FaceDetector;
-import fr.olympicinsa.riocognized.facedetector.ImageConvertor;
 
 import fr.olympicinsa.riocognized.facedetector.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.Riocognized;
 import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
 import org.apache.log4j.Logger;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-
-import org.opencv.core.Mat;
 
 
 /**
@@ -47,8 +35,9 @@ public class RioRecognizer {
 
     public static Logger LOGGER = Logger.getLogger(Riocognized.class);
 
-    private final double THREASHOLD = 10.0;
-
+    private final double THREASHOLD = 100.0;
+    private final int EIGEN_SIZE = 50;
+    
     private final FaceDBReader faceDatabase;
     private final FaceRecognizer eigenRecognizer;
     private final String savePath;
@@ -67,7 +56,7 @@ public class RioRecognizer {
         this.faceDetector = new FaceDetector();
         this.faceDatabase = db;
         this.savePath = out;
-        this.eigenRecognizer = createEigenFaceRecognizer(10, THREASHOLD);
+        this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
     }
 
     public void init() {
@@ -84,12 +73,9 @@ public class RioRecognizer {
             try {
                 img = cvLoadImage(face[0],CV_LOAD_IMAGE_GRAYSCALE);
                 label = face[1];
-                System.out.println("Read image(" + counter + ") in " + face[0]);
-                LOGGER.info("Image loaded :"  + face[0]);
+                System.err.println("Read image(" + counter + ") in " + face[0]);
                 grayImg = toFittedGray(img, x, y);
-
                 imagesDB.put(counter, grayImg);
-
                 athletes[counter] = new Integer(label);
                 
                 counter++;
@@ -103,9 +89,7 @@ public class RioRecognizer {
         if (imagesDB.size() < 1) {
             init();
         }
-        for (int i : athletes) {
-            System.out.println("Athlete #" + i);
-        }
+        System.err.println("Train FaceRecognizer ...");
         eigenRecognizer.train(imagesDB, athletes);
     }
 
@@ -114,13 +98,10 @@ public class RioRecognizer {
         int result = 0;
         int[] athlete = new int[1];
         try {
-            //BufferedImage cropedBuffered = ImageConvertor.matToBufferedImage(image);
-            System.err.println("To IPL");
-            //IplImage croped = IplImage.createFrom(cropedBuffered);
-             System.err.println("To FittedGrey scale");
+            System.err.println("Test image converting FittedGrey scale");
             IplImage greyPredictImage = toFittedGray(image, x, y);
-            System.err.println("Try to predict");
-            eigenRecognizer.predict(greyPredictImage);
+            System.err.println("Try to predict ...");
+            result = eigenRecognizer.predict(greyPredictImage);
         } catch (Exception e) {
             System.err.println("Can't detect any face");
             e.printStackTrace();
@@ -130,9 +111,8 @@ public class RioRecognizer {
             System.err.println("Ath:" + athlete[0]);
             System.err.println("Dist :" + distance[0]);
             return athlete[0];
-            
         }
-        return 0;
+        return result;
     }
 
     public void save() {
@@ -155,36 +135,25 @@ public class RioRecognizer {
      * @return
      */
     public IplImage toFittedGray(IplImage image, int x, int y) {
-        CvPoint minloc = new CvPoint();
-        CvPoint maxloc = new CvPoint();
-        double[] minVal = new double[1];
-        double[] maxVal = new double[1];
-        if (minVal[0] < -1e30) {
-            minVal[0] = -1e30;
-        }
-        if (maxVal[0] > 1e30) {
-            maxVal[0] = 1e30;
-        }
-        if (maxVal[0] - minVal[0] == 0.0f) {
-            maxVal[0] = minVal[0] + 0.001;  // remove potential divide by zero errors.
-        }   
-        System.err.println(minVal[0] +"  "+maxVal[0] );
-        // Convert the format
+
+        // Create empty image
         final IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_8U, 1);
         final IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
-        System.err.println("Gray");
-        //cvCvtColor(image, gray, CV_BGR2GRAY);
+        //System.err.println("Convert to Grayscale");
         cvConvertScale(image, gray, 1./255,0);
-        System.err.println("Resizing");
+        //System.err.println("Resizing image");
         cvResize(gray, resized, CV_INTER_AREA);
         System.err.println("Egalisation");
         cvEqualizeHist(resized, resized);
+        
+        /* Write gray scale resized image
         BufferedImage write = resized.getBufferedImage();
         try {
             ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl"+image.toString()+".jpg"));
         } catch (IOException e) {
             
         }
+        */
         return resized;
     }
 }
