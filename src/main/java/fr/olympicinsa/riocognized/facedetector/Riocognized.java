@@ -1,22 +1,35 @@
 package fr.olympicinsa.riocognized.facedetector;
 
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
+import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
 import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.imageio.ImageIO;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 
 public class Riocognized {
-
+    
+    public static Logger LOGGER = Logger.getLogger(Riocognized.class);
+    
     public static void main(String[] args) {
+
+        PropertyConfigurator.configure(
+          Riocognized.class.getClassLoader().getResource("log4j.properties"));
+        
+        LOGGER.info("Demarrage de Riocognize");
         DateFormat dateFormat = new SimpleDateFormat("hhmmss-dd-MM-yy");
         Date date = new Date();
         String dateString = dateFormat.format(date);
@@ -51,15 +64,22 @@ public class Riocognized {
         
         // Test RioRecognizer
         String path = "/opt/openCV/test.yml";
-        faceDB = new FaceDBReader("opt/openCV/testDB/faces.csv");
+        faceDB = new FaceDBReader("/opt/openCV/athleteDB/faces.csv");
         RioRecognizer recognizor = new RioRecognizer(faceDB, path);
         recognizor.init();
         recognizor.train();
         recognizor.save();
-        recognizor = null;
-        recognizor = new RioRecognizer(faceDB, "/opt/openCV/test2.yml");
-        recognizor.load(path);
-        recognizor.save();
+        
+        IplImage toTest = cvLoadImage("/opt/openCV/athleteDB/13/face0.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+        BufferedImage write = toTest.getBufferedImage();
+        try {
+            ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl.jpg"));
+        } catch (IOException e) {
+            
+        }
+        //Mat toTest = Highgui.imread("/opt/openCV/athleteDB/13/face0.jpg");
+        int athlete = recognizor.predictedLabel(toTest);
+        System.out.println("Athlete recognized : "+ athlete);
         
         try {
             FaceDetector faceDetector = new FaceDetector();
