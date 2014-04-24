@@ -15,21 +15,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.imageio.ImageIO;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 
 public class Riocognized {
     
-    public static Logger LOGGER = Logger.getLogger(Riocognized.class);
+    public static Logger log = Logger.getLogger(Riocognized.class);
     
     public static void main(String[] args) {
 
-        PropertyConfigurator.configure(
-          Riocognized.class.getClassLoader().getResource("log4j.properties"));
+        DOMConfigurator.configure(Thread.currentThread().getContextClassLoader().getResource("log4j.xml"));
         
-        LOGGER.info("Demarrage de Riocognize");
+        log.info("Demarrage de Riocognized");
         DateFormat dateFormat = new SimpleDateFormat("hhmmss-dd-MM-yy");
         Date date = new Date();
         String dateString = dateFormat.format(date);
@@ -38,7 +39,7 @@ public class Riocognized {
 
         //System.load("/opt/openCV/libopencv_java248.so");
         //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        System.out.println("\nRunning Riocognized FaceDetector");
+        log.info("\nRunning Riocognized FaceDetector");
         String imageParam = (args.length > 0) ? args[0] : "/opt/openCV/image.jpg";
 
         try {

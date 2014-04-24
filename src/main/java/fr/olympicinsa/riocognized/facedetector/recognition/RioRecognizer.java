@@ -25,19 +25,16 @@ import fr.olympicinsa.riocognized.facedetector.Riocognized;
 import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
 import org.apache.log4j.Logger;
 
-
-
 /**
  *
  * @author alex
  */
 public class RioRecognizer {
 
-    public static Logger LOGGER = Logger.getLogger(Riocognized.class);
-
+    public static Logger log = Logger.getLogger(RioRecognizer.class);
     private final double THREASHOLD = 5.0;
     private final int EIGEN_SIZE = 10;
-    
+
     private final FaceDBReader faceDatabase;
     private final FaceRecognizer eigenRecognizer;
     private final String savePath;
@@ -71,16 +68,16 @@ public class RioRecognizer {
 
         for (String[] face : faceDatabase.getFaces()) {
             try {
-                img = cvLoadImage(face[0],CV_LOAD_IMAGE_GRAYSCALE);
+                img = cvLoadImage(face[0], CV_LOAD_IMAGE_GRAYSCALE);
                 label = face[1];
-                System.err.println("Read image(" + counter + ") in " + face[0]);
+                log.info("Read image(" + counter + ") in " + face[0]);
                 grayImg = toFittedGray(img, x, y);
                 imagesDB.put(counter, grayImg);
                 athletes[counter] = new Integer(label);
-                
+
                 counter++;
             } catch (Exception e) {
-                System.err.println("Can't read image(" + counter + ") in " + face[0]);
+                log.error("Can't read image(" + counter + ") in " + face[0]);
             }
         }
     }
@@ -89,7 +86,7 @@ public class RioRecognizer {
         if (imagesDB.size() < 1) {
             init();
         }
-        System.err.println("Train FaceRecognizer ...");
+        log.info("Train FaceRecognizer ...");
         eigenRecognizer.train(imagesDB, athletes);
     }
 
@@ -98,18 +95,18 @@ public class RioRecognizer {
         int result = 0;
         int[] athlete = new int[1];
         try {
-            System.err.println("Test image converting FittedGrey scale");
+            log.info("Test image converting FittedGrey scale");
             IplImage greyPredictImage = toFittedGray(image, x, y);
-            System.err.println("Try to predict ...");
+            log.info("Try to predict ...");
             result = eigenRecognizer.predict(greyPredictImage);
         } catch (Exception e) {
-            System.err.println("Can't detect any face");
+            log.error("Can't detect any face");
             e.printStackTrace();
             return 0;
         }
         if ((athlete[0] != 0) && (athlete[0] <= athletes.length)) {
-            System.err.println("Ath:" + athlete[0]);
-            System.err.println("Dist :" + distance[0]);
+            log.info("Ath:" + athlete[0]);
+            log.info("Dist :" + distance[0]);
             return athlete[0];
         }
         return result;
@@ -117,16 +114,16 @@ public class RioRecognizer {
 
     public void save() {
         eigenRecognizer.save(savePath);
-        LOGGER.info("Face Recognizer saved to" + savePath);
+        log.info("Face Recognizer saved to" + savePath);
     }
 
     public void load(String path) {
         eigenRecognizer.load(path);
-        LOGGER.info("Face Recognizer loaded from " + savePath);
+        log.info("Face Recognizer loaded from " + savePath);
     }
 
     /**
-     * Images should be resized and grayscaled before eignefaces. Then, egalized
+     * Images should be resized and grayscaled before eigenfaces. Then, egalized
      * its histogram
      *
      * @param image
@@ -139,21 +136,21 @@ public class RioRecognizer {
         // Create empty image
         final IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_8U, 1);
         final IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
-        //System.err.println("Convert to Grayscale");
-        cvConvertScale(image, gray, 1./255,0);
-        //System.err.println("Resizing image");
+        log.info("Convert to Grayscale");
+        cvConvertScale(image, gray, 1. / 255, 0);
+        log.info("Resizing image");
         cvResize(gray, resized, CV_INTER_AREA);
-        System.err.println("Egalisation");
+        log.info("Egalisation");
         cvEqualizeHist(resized, resized);
-        
+
         /* Write gray scale resized image
-        BufferedImage write = resized.getBufferedImage();
-        try {
-            ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl"+image.toString()+".jpg"));
-        } catch (IOException e) {
+         BufferedImage write = resized.getBufferedImage();
+         try {
+         ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl"+image.toString()+".jpg"));
+         } catch (IOException e) {
             
-        }
-        */
+         }
+         */
         return resized;
     }
 }
