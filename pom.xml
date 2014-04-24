@@ -30,8 +30,44 @@
             <artifactId>opencsv</artifactId>
             <version>2.3</version>
         </dependency>
-            
+
+        <dependency>
+            <groupId>com.googlecode.javacv</groupId>
+            <artifactId>javacv</artifactId>
+            <version>0.7</version>
+        </dependency>
+
+        <!-- For Linux x64 environments -->
+        <dependency>
+            <groupId>com.googlecode.javacv</groupId>
+            <artifactId>javacv</artifactId>
+            <classifier>linux-x86_64</classifier>
+            <version>0.7</version>
+        </dependency>        
+
+        <!-- For OSX environments -->
+        <dependency>
+            <groupId>com.googlecode.javacv</groupId>
+            <artifactId>javacv</artifactId>
+            <classifier>macosx-x86_64</classifier>
+            <version>0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.7.5</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>javacv</id>
+            <name>JavaCV</name>
+            <url>http://maven2.javacv.googlecode.com/git/</url>
+        </repository>
+    </repositories>
+    
     <build>
         <finalName>${project.artifactId}-${project.version}-nodependency</finalName>
         <plugins>
@@ -60,7 +96,7 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
