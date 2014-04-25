@@ -2,6 +2,7 @@ package fr.olympicinsa.riocognized.facedetector;
 
 import java.awt.image.BufferedImage;
 import static java.lang.System.exit;
+import org.apache.log4j.Logger;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
@@ -13,7 +14,9 @@ import org.opencv.objdetect.CascadeClassifier;
 
 
 public class FaceDetector {
-
+    
+    public static Logger log = Logger.getLogger(FaceDetector.class);
+    
     public final static String CASCADE_RIGHT_EAR = "haarcascade_mcs_rightear.xml";
     public final static String CASCADE_PROFILEFACE = "haarcascade_profileface.xml";
     public final static String CASCADE_FRONTALEFACE = "haarcascade_frontalface_alt.xml";
@@ -32,7 +35,7 @@ public class FaceDetector {
         try {
             haarFilter = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_FRONTALEFACE);
         } catch (Exception e) {
-            System.err.println("Can't create FaceDetector");
+            log.error("Can't create FaceDetector");
             exit(0);
         }
     }

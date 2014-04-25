@@ -48,6 +48,12 @@ public class RioRecognizer {
     private MatVector imagesDB;
     private int[] athletes;
 
+    /**
+     * Constructor for FaceRecognizer
+     * 
+     * @param db FaceDBReader containing path and label of faces images
+     * @param out String where FaceRecognizer is saved
+     */
     public RioRecognizer(FaceDBReader db, String out) {
         this.opencv = OpenCV.getInstance();
         this.faceDetector = new FaceDetector();
@@ -56,6 +62,9 @@ public class RioRecognizer {
         this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
     }
 
+    /**
+     * Initialize FaceRecognizer loading images stored in csv file 
+     */
     public void init() {
         imagesDB = new MatVector(faceDatabase.getFaces().size());
         athletes = new int[faceDatabase.getFaces().size()];
@@ -70,7 +79,7 @@ public class RioRecognizer {
             try {
                 img = cvLoadImage(face[0], CV_LOAD_IMAGE_GRAYSCALE);
                 label = face[1];
-                log.info("Read image(" + counter + ") in " + face[0]);
+                log.debug("Read image(" + counter + ") in " + face[0]);
                 grayImg = toFittedGray(img, x, y);
                 imagesDB.put(counter, grayImg);
                 athletes[counter] = new Integer(label);
@@ -80,8 +89,13 @@ public class RioRecognizer {
                 log.error("Can't read image(" + counter + ") in " + face[0]);
             }
         }
+        log.info(counter + "Faces readed");
     }
 
+    /**
+     * Train face recognizer calculating ACP
+     * 
+     */
     public void train() {
         if (imagesDB.size() < 1) {
             init();
@@ -90,12 +104,18 @@ public class RioRecognizer {
         eigenRecognizer.train(imagesDB, athletes);
     }
 
+    /**
+     * Try to recognize a face, using configured database
+     * 
+     * @param image IplImage croped face to recognized
+     * @return int of recognized Athlete id
+     */
     public int predictedLabel(IplImage image) {
         double distance[] = new double[1];
         int result = 0;
         int[] athlete = new int[1];
         try {
-            log.info("Test image converting FittedGrey scale");
+            log.info("Test image is converting FittedGrey scale");
             IplImage greyPredictImage = toFittedGray(image, x, y);
             log.info("Try to predict ...");
             result = eigenRecognizer.predict(greyPredictImage);
@@ -112,35 +132,42 @@ public class RioRecognizer {
         return result;
     }
 
+    /**
+     * Save Eigenfaces value and FaceRecognizer config to yml file
+     */
     public void save() {
         eigenRecognizer.save(savePath);
         log.info("Face Recognizer saved to" + savePath);
     }
 
+    /**
+     *
+     * @param path String of path to saved FaceRecognizer
+     */
     public void load(String path) {
         eigenRecognizer.load(path);
-        log.info("Face Recognizer loaded from " + savePath);
+        log.info("Face Recognizer loaded from " + path);
     }
 
     /**
      * Images should be resized and grayscaled before eigenfaces. Then, egalized
      * its histogram
      *
-     * @param image
-     * @param x
-     * @param y
-     * @return
+     * @param image IplImage of byte image to fit for ACP
+     * @param x int of new image width
+     * @param y int of new image height
+     * @return IplImage of grayscale fitted image
      */
     public IplImage toFittedGray(IplImage image, int x, int y) {
 
         // Create empty image
         final IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_8U, 1);
         final IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
-        log.info("Convert to Grayscale");
+        log.debug("Convert to Grayscale");
         cvConvertScale(image, gray, 1. / 255, 0);
-        log.info("Resizing image");
+        log.debug("Resizing image");
         cvResize(gray, resized, CV_INTER_AREA);
-        log.info("Egalisation");
+        log.debug("Egalisation");
         cvEqualizeHist(resized, resized);
 
         /* Write gray scale resized image
@@ -151,6 +178,7 @@ public class RioRecognizer {
             
          }
          */
+        
         return resized;
     }
 }
