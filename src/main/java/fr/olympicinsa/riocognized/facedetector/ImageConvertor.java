@@ -5,6 +5,12 @@
  */
 package fr.olympicinsa.riocognized.facedetector;
 
+import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+import static com.googlecode.javacv.cpp.opencv_core.cvCreateImage;
+import static com.googlecode.javacv.cpp.opencv_core.cvSize;
+import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
+import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import javax.imageio.ImageIO;
@@ -118,4 +124,16 @@ public class ImageConvertor {
         return imageInByte;
     }
 
+    /**
+     * Converts a Mat into a IplImage (GRAY_SCALED, depht = 8, Ch = 1).
+     *
+     * @param matImage Mat of type CV_8UC3
+     * @return IplImage iplImage (IPL_DEPTH_8U, 1 Channel)
+     */
+    public static IplImage matToIplImage(Mat matImage) {
+        IplImage image8UC3 = IplImage.createFrom(ImageConvertor.matToBufferedImage(matImage));
+        final IplImage resized = cvCreateImage(cvSize(image8UC3.width(), image8UC3.height()), IPL_DEPTH_8U, 1);
+        cvCvtColor(image8UC3, resized, CV_BGR2GRAY);
+        return resized;
+    }
 }
