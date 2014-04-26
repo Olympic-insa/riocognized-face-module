@@ -7,6 +7,8 @@ package fr.olympicinsa.riocognized.facedetector.recognition;
 
 import com.googlecode.javacv.cpp.opencv_contrib.FaceRecognizer;
 import static com.googlecode.javacv.cpp.opencv_contrib.createEigenFaceRecognizer;
+import static com.googlecode.javacv.cpp.opencv_contrib.createFisherFaceRecognizer;
+import static com.googlecode.javacv.cpp.opencv_contrib.createLBPHFaceRecognizer;
 import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.MatVector;
@@ -21,7 +23,6 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
 import fr.olympicinsa.riocognized.facedetector.FaceDetector;
 
 import fr.olympicinsa.riocognized.facedetector.OpenCV;
-import fr.olympicinsa.riocognized.facedetector.Riocognized;
 import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
 import org.apache.log4j.Logger;
 
@@ -32,25 +33,25 @@ import org.apache.log4j.Logger;
 public class RioRecognizer {
 
     public static Logger log = Logger.getLogger(RioRecognizer.class);
-    private final double THREASHOLD = 5.0;
-    private final int EIGEN_SIZE = 10;
+    private final double THREASHOLD = 100.0;
+    private final int EIGEN_SIZE = 60;
 
     private final FaceDBReader faceDatabase;
-    private final FaceRecognizer eigenRecognizer;
     private final String savePath;
     private final FaceDetector faceDetector;
     private final OpenCV opencv;
     // To scall faces
     private final int F = 2;
-    private int x = 100;
-    private int y = 100;
+    private int x = 60;
+    private int y = 60;
 
     private MatVector imagesDB;
     private int[] athletes;
+    private FaceRecognizer eigenRecognizer;
 
     /**
      * Constructor for FaceRecognizer
-     * 
+     *
      * @param db FaceDBReader containing path and label of faces images
      * @param out String where FaceRecognizer is saved
      */
@@ -59,11 +60,42 @@ public class RioRecognizer {
         this.faceDetector = new FaceDetector();
         this.faceDatabase = db;
         this.savePath = out;
-        this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
+        //this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
+        log.info("Create LBPH Recognizer (2, 8, 8, 8, 200)");
+        this.eigenRecognizer = createLBPHFaceRecognizer(2, 8, 8, 8, 200);
+    }
+    /**
+     * Switch to an other algorithm
+     */
+    public void changeRecognizer(int nRec) {
+        switch (nRec) {
+            case 0:
+                log.info("Create LBPH FaceRecognizer (1,8,8,8,100)");
+                eigenRecognizer = createLBPHFaceRecognizer(1, 8, 8, 8, 100);
+                break;
+            case 1:
+                log.info("Create Fischer Recognizer");
+                ;
+                eigenRecognizer = createFisherFaceRecognizer();
+                break;
+            case 2:
+                log.info("Create EigenRecognizer");
+                eigenRecognizer = createEigenFaceRecognizer();
+                break;
+            case 3:
+                log.info("Create Eigen Recognizer (" + EIGEN_SIZE + " / " + THREASHOLD);
+                this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
+                break;
+            case 4:
+                log.info("Create LBPH Recognizer (2, 8, 8, 8, 200)");
+                this.eigenRecognizer = createLBPHFaceRecognizer(2, 8, 8, 8, 200);
+        }
+        train();
+
     }
 
     /**
-     * Initialize FaceRecognizer loading images stored in csv file 
+     * Initialize FaceRecognizer loading images stored in csv file
      */
     public void init() {
         imagesDB = new MatVector(faceDatabase.getFaces().size());
@@ -89,12 +121,12 @@ public class RioRecognizer {
                 log.error("Can't read image(" + counter + ") in " + face[0]);
             }
         }
-        log.info(counter + "Faces readed");
+        log.info(counter + " Faces readed");
     }
 
     /**
      * Train face recognizer calculating ACP
-     * 
+     *
      */
     public void train() {
         if (imagesDB.size() < 1) {
@@ -106,7 +138,7 @@ public class RioRecognizer {
 
     /**
      * Try to recognize a face, using configured database
-     * 
+     *
      * @param image IplImage croped face to recognized
      * @return int of recognized Athlete id
      */
@@ -118,16 +150,20 @@ public class RioRecognizer {
             log.info("Test image is converting FittedGrey scale");
             IplImage greyPredictImage = toFittedGray(image, x, y);
             log.info("Try to predict ...");
-            result = eigenRecognizer.predict(greyPredictImage);
+            //result = eigenRecognizer.predict(image);
+            eigenRecognizer.predict(greyPredictImage, athlete, distance);
+
+            if (athlete[0] != -1) {
+                log.info("Ath:" + athlete[0]);
+                log.info("Dist :" + distance[0]);
+                result = athlete[0];
+            } else {
+                result = -1;
+            }
         } catch (Exception e) {
             log.error("Can't detect any face");
             e.printStackTrace();
             return 0;
-        }
-        if ((athlete[0] != 0) && (athlete[0] <= athletes.length)) {
-            log.info("Ath:" + athlete[0]);
-            log.info("Dist :" + distance[0]);
-            return athlete[0];
         }
         return result;
     }
@@ -178,7 +214,6 @@ public class RioRecognizer {
             
          }
          */
-        
         return resized;
     }
 }
