@@ -42,7 +42,10 @@ public class RioRecognizer {
     private MatVector imagesDB;
     private int[] athletes;
     private FaceRecognizer eigenRecognizer;
-
+    
+    private int[] athlete = new int[1];
+    private double distance[] = new double[1];
+    
     /**
      * Constructor for FaceRecognizer
      *
@@ -137,9 +140,8 @@ public class RioRecognizer {
      * @return int of recognized Athlete id
      */
     public int predictedLabel(IplImage image) {
-        double distance[] = new double[1];
         int result = 0;
-        int[] athlete = new int[1];
+
         try {
             log.info("Test image is converting FittedGrey scale");
             IplImage greyPredictImage = Treatment.beforeRecognition(image, x, y);
@@ -177,5 +179,15 @@ public class RioRecognizer {
     public void load(String path) {
         eigenRecognizer.load(path);
         log.info("Face Recognizer loaded from " + path);
+    }
+    
+    /**
+     * Get Precision of detection
+     */
+    public double[] getPrecision() {
+        if (distance != null)
+            return distance;
+        else
+            return null;
     }
 }
