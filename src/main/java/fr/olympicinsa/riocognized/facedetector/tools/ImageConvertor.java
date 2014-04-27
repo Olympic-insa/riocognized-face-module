@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.olympicinsa.riocognized.facedetector;
+package fr.olympicinsa.riocognized.facedetector.tools;
 
 import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import org.apache.log4j.Logger;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
@@ -26,6 +27,8 @@ import org.opencv.core.Mat;
  */
 public class ImageConvertor {
 
+    public static Logger log = Logger.getLogger(ImageConvertor.class);
+
     /**
      * Converts/writes a Mat into a BufferedImage.
      *
@@ -33,6 +36,8 @@ public class ImageConvertor {
      * @return BufferedImage of type TYPE_3BYTE_BGR or TYPE_BYTE_GRAY
      */
     public static BufferedImage matToBufferedImage(Mat matrix) {
+        log.debug("****** MatToBuffered Image **********");
+        log.debug("input : " + matrix.toString());
         int cols = matrix.cols();
         int rows = matrix.rows();
         int elemSize = (int) matrix.elemSize();
@@ -64,7 +69,9 @@ public class ImageConvertor {
 
         BufferedImage image = new BufferedImage(cols, rows, type);
         image.getRaster().setDataElements(0, 0, cols, rows, data);
-
+        log.debug("type: " + type);
+        log.debug("output:" + image.toString());
+        log.debug("***********************************");
         return image;
     }
 
@@ -75,11 +82,15 @@ public class ImageConvertor {
      * @return Mat image of type CV_8UC3
      */
     public static Mat bufferedImagetoMat(BufferedImage image) {
+        log.debug("********bufferedImageToMat *********");
+        log.debug("input : " + image.toString());
         int rows = image.getWidth();
         int cols = image.getHeight();
         byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
         Mat mat = new Mat(cols, rows, CvType.CV_8UC3);
         mat.put(0, 0, data);
+        log.debug("output : "+ mat.toString());
+        log.debug("***********************************");
         return mat;
     }
 
@@ -131,9 +142,16 @@ public class ImageConvertor {
      * @return IplImage iplImage (IPL_DEPTH_8U, 1 Channel)
      */
     public static IplImage matToIplImage(Mat matImage) {
+        log.debug("********** matToIplImage starting **********");
+        log.debug("input:" + matImage.toString());
         IplImage image8UC3 = IplImage.createFrom(ImageConvertor.matToBufferedImage(matImage));
-        final IplImage resized = cvCreateImage(cvSize(image8UC3.width(), image8UC3.height()), IPL_DEPTH_8U, 1);
-        cvCvtColor(image8UC3, resized, CV_BGR2GRAY);
+        IplImage resized = cvCreateImage(cvSize(image8UC3.width(), image8UC3.height()), IPL_DEPTH_8U, 1);
+        if (image8UC3.nChannels() > 1)
+            cvCvtColor(image8UC3, resized, CV_BGR2GRAY);
+        else 
+            resized = image8UC3;
+        log.debug("output: " + resized.toString());
+        log.debug("*****************************************\n");
         return resized;
     }
 }

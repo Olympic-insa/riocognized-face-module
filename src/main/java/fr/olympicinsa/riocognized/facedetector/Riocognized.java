@@ -1,7 +1,9 @@
 package fr.olympicinsa.riocognized.facedetector;
 
+import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
+import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
-import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +18,7 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/usain.jpg";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/brownlee2.jpg";
 
     public static void main(String[] args) {
 
@@ -77,6 +79,7 @@ public class Riocognized {
                 }
             } catch (Exception e) {
                 log.error("Error processiong detection");
+                e.printStackTrace();
             }
 
         } catch (Exception e) {

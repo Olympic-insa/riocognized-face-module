@@ -1,9 +1,11 @@
 package fr.olympicinsa.riocognized.facedetector;
 
+import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
+import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
-import fr.olympicinsa.riocognized.facedetector.csv.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

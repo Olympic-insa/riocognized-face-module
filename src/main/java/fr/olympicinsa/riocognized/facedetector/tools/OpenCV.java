@@ -1,4 +1,4 @@
-package fr.olympicinsa.riocognized.facedetector;
+package fr.olympicinsa.riocognized.facedetector.tools;
 
 import org.opencv.core.Core;
 

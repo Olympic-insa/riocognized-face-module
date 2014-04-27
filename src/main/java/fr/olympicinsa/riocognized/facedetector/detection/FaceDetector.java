@@ -1,5 +1,8 @@
-package fr.olympicinsa.riocognized.facedetector;
+package fr.olympicinsa.riocognized.facedetector.detection;
 
+import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
+import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
+import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
 import java.awt.image.BufferedImage;
 import static java.lang.System.exit;
 import org.apache.log4j.Logger;
@@ -139,7 +142,8 @@ public class FaceDetector {
             Rect rectCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
             Mat cropImage = new Mat(image, rectCrop);
             //Write new bufferedImage
-            return ImageConvertor.matToBufferedImage(cropImage);
+            Mat grayScaled = Treatment.beforeDetection(cropImage);
+            return ImageConvertor.matToBufferedImage(grayScaled);
         } else {
             return null;
         }
@@ -162,7 +166,8 @@ public class FaceDetector {
             Rect rect = faceDetections.toArray()[0];
             Rect rectCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
             Mat cropImage = new Mat(image, rectCrop);
-            return cropImage;
+            Mat grayScaled = Treatment.beforeDetection(cropImage);
+            return grayScaled;
         } else {
             return null;
         }
