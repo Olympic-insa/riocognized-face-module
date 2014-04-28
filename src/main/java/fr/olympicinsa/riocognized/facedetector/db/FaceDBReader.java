@@ -7,12 +7,14 @@ package fr.olympicinsa.riocognized.facedetector.db;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import fr.olympicinsa.riocognized.facedetector.exception.FaceDBException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -20,38 +22,41 @@ import java.util.List;
  */
 public class FaceDBReader {
 
+    public static Logger log = Logger.getLogger(FaceDBReader.class);
     private static String pathDB;
     private List faces;
 
-
     public FaceDBReader() {
-        faces = new ArrayList<String>();
+        faces = new ArrayList<>();
     }
 
     /**
      * FaceDBReader Constructor
-     * 
+     *
      * @param faceDB String of path to csv file
      */
     public FaceDBReader(String faceDB) {
         pathDB = faceDB;
-        faces = new ArrayList<String>();
-        File file = new File(pathDB); 
+        faces = new ArrayList<>();
+        File file = new File(pathDB);
         try {
-            if (!file.exists()) file.createNewFile();
+            if (!file.exists()) {
+                file.createNewFile();
+            }
             faces = readFile(pathDB);
-        } catch (IOException e) {
-            System.err.println("Can't read/create faceDB csv");
+        } catch (IOException | FaceDBException e) {
+            log.error("Can't read/create faceDB csv");
         }
     }
 
     /**
      * Read line form csv file
-     * 
+     *
      * @param file
-     * @return List of String[] containing face info 
+     * @return List of String[] containing face info
+     * @throws FaceDBException
      */
-    public static List readFile(String file) {
+    public static List readFile(String file) throws FaceDBException {
 
         try {
             FileReader fileReader = new FileReader(file);
@@ -60,20 +65,22 @@ public class FaceDBReader {
             csvReader.close();
             return content;
         } catch (IOException e) {
-            return null;
+            throw new FaceDBException("Can't find csv file", e);
         }
     }
 
     /**
      * Write csv file with faceDB list to pathDB
+     *
+     * @throws FaceDBException
      */
-    public void writeFile() {
+    public void writeFile() throws FaceDBException {
         try {
             CSVWriter writer = new CSVWriter(new FileWriter(pathDB), ';');
             writer.writeAll(faces);
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FaceDBException("Can't write csv file", e);
         }
     }
 
@@ -87,7 +94,7 @@ public class FaceDBReader {
 
     /**
      * Set faces list
-     * 
+     *
      * @param faces List of faces
      */
     public void setList(List<String[]> faces) {
@@ -96,7 +103,7 @@ public class FaceDBReader {
 
     /**
      * Add face to faceDB list
-     * 
+     *
      * @param face String[] w/h athlete face {path, id}
      */
     public void addFace(String[] face) {
@@ -105,7 +112,7 @@ public class FaceDBReader {
 
     /**
      * Delete athletes face from faceDB list
-     * 
+     *
      * @param face String[] of athlete face {path, id}
      */
     public void deleteFace(String[] face) {

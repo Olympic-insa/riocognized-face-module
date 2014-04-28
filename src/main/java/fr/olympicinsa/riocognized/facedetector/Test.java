@@ -6,10 +6,12 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.exception.FaceDBException;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,7 +52,12 @@ public class Test {
         data.add(new String[]{"Germany", "Berlin"});
         faceDB.setList(data);
         faceDB.addFace(new String[]{"Germany", "Berlin"});
+        try {
         faceDB.writeFile();
+        } catch (FaceDBException e) {
+            log.error("Test FaceDB Error !");
+            e.printStackTrace();
+        }
         log.info("Test FaceDB OK !");
 
         // Test RioRecognizer
@@ -132,7 +139,7 @@ public class Test {
                 log.error("Error processiong detection");
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Error in covnersion function");
             e.printStackTrace();
         }
