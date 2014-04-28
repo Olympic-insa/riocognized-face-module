@@ -183,10 +183,22 @@ public class RioRecognizer {
     
     /**
      * Get Precision of detection
+     * @return double[] of precision
      */
     public double[] getPrecision() {
         if (distance != null)
             return distance;
+        else
+            return null;
+    }
+    
+    /**
+     * Get Result of detection
+     * @return int[] of recognized athletes
+     */
+    public int[] getResult() {
+        if (athlete != null)
+            return athlete;
         else
             return null;
     }
