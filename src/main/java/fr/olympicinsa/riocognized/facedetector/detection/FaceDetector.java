@@ -11,21 +11,23 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 import org.opencv.objdetect.CascadeClassifier;
 
-
 public class FaceDetector {
-    
-    public static Logger log = Logger.getLogger(FaceDetector.class);
-    
-    public final static String CASCADE_RIGHT_EAR = "haarcascade_mcs_rightear.xml";
-    public final static String CASCADE_PROFILEFACE = "haarcascade_profileface.xml";
-    public final static String CASCADE_FRONTALEFACE = "haarcascade_frontalface_alt.xml";
 
+    public static Logger log = Logger.getLogger(FaceDetector.class);
+
+    public final static String CASCADE_FRONTAL_DEFAULT = "haarcascade_frontalface_alt.xml";
+    public final static String CASCADE_PROFILEFACE = "haarcascade_profileface.xml";
+    public final static String CASCADE_FRONTALEFACE = "haarcascade_frontalface_alt2.xml";
+    public Size minSize = new Size(15,15);
+    public Size maxSize = new Size(1000,1000);
     private int facesDetected;
-    private CascadeClassifier haarFilter;
+    private CascadeClassifier frontalDetector;
+    private CascadeClassifier profileDetector;
     private static OpenCV openCV;
 
     /**
@@ -36,7 +38,9 @@ public class FaceDetector {
         openCV = OpenCV.getInstance();
         //Load Haar Cascade Classifier
         try {
-            haarFilter = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_FRONTALEFACE);
+            log.info("FaceDetector use : " +  CASCADE_FRONTAL_DEFAULT);
+            frontalDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_FRONTAL_DEFAULT);
+            profileDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_PROFILEFACE);
         } catch (Exception e) {
             log.error("Can't create FaceDetector");
             exit(0);
@@ -57,7 +61,7 @@ public class FaceDetector {
         Mat image = Highgui.imread(imageURL);
 
         MatOfRect faceDetections = new MatOfRect();
-        haarFilter.detectMultiScale(image, faceDetections);
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 6, 10, minSize, maxSize);
 
         int detected = faceDetections.toArray().length;
 
@@ -83,8 +87,8 @@ public class FaceDetector {
     public int detectFaces(Mat image, String output) {
 
         MatOfRect faceDetections = new MatOfRect();
-        haarFilter.detectMultiScale(image, faceDetections);
-
+        log.info("FaceDetector param : scale=1.05-neigh=3");
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
 
@@ -109,8 +113,7 @@ public class FaceDetector {
     public BufferedImage detectFacesToBufferedImage(Mat image) {
 
         MatOfRect faceDetections = new MatOfRect();
-        haarFilter.detectMultiScale(image, faceDetections);
-
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
 
@@ -133,8 +136,7 @@ public class FaceDetector {
     public BufferedImage cropFaceToBufferedImage(Mat image) {
 
         MatOfRect faceDetections = new MatOfRect();
-        haarFilter.detectMultiScale(image, faceDetections);
-
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
         if (faceDetections.toArray().length > 0) {
@@ -158,9 +160,15 @@ public class FaceDetector {
     public Mat cropFaceToMat(Mat image) {
 
         MatOfRect faceDetections = new MatOfRect();
-        haarFilter.detectMultiScale(image, faceDetections);
-
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
         int detected = faceDetections.toArray().length;
+        if (detected == 0){
+            log.info("FaceDetector try Profile");
+            log.info("FaceDetector use : " +  CASCADE_PROFILEFACE);
+            frontalDetector.load(CASCADE_PROFILEFACE);// = profileDetector;
+            frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
+            detected = faceDetections.toArray().length;
+        }
         this.facesDetected = detected;
         if (detected > 0) {
             Rect rect = faceDetections.toArray()[0];
