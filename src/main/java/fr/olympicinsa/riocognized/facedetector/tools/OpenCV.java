@@ -1,5 +1,6 @@
 package fr.olympicinsa.riocognized.facedetector.tools;
 
+import static fr.olympicinsa.riocognized.facedetector.tools.NativeLibraryLoader.loadLibraryFromJar;
 import org.opencv.core.Core;
 
 public class OpenCV {
@@ -12,8 +13,8 @@ public class OpenCV {
      */
     public static void loadLibrary() {
         try {
-            System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-            //System.load(libraryPath + "libopencv_java248.so");
+            //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+            loadLibraryFromJar("/lib/libopencv_java248.so");
         } catch (Exception e) {
             System.out.println("classPath=" + System.getProperty("java.library.path"));
         }

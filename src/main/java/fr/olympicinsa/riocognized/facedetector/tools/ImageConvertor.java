@@ -99,6 +99,7 @@ public class ImageConvertor {
      *
      * @param byteImage byte[] containing image
      * @return Mat matImage of type CV_8UC3
+     * @throws IOException
      */
     public static Mat byteArrayToMat(byte[] byteImage) throws IOException {
         ByteArrayInputStream in = new ByteArrayInputStream(byteImage);
