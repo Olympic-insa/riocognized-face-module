@@ -18,7 +18,7 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/brownlee2.jpg";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/brownlee4.jpg";
 
     public static void main(String[] args) {
 

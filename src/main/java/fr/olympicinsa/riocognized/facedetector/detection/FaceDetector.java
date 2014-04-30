@@ -1,5 +1,9 @@
 package fr.olympicinsa.riocognized.facedetector.detection;
 
+import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_DO_CANNY_PRUNING;
+import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_DO_ROUGH_SEARCH;
+import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_FIND_BIGGEST_OBJECT;
+import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_SCALE_IMAGE;
 import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
@@ -24,7 +28,7 @@ public class FaceDetector {
     public final static String CASCADE_PROFILEFACE = "haarcascade_profileface.xml";
     public final static String CASCADE_FRONTALEFACE = "haarcascade_frontalface_alt2.xml";
     public Size minSize = new Size(15,15);
-    public Size maxSize = new Size(1000,1000);
+    public Size maxSize = new Size(500,500);
     private int facesDetected;
     private CascadeClassifier frontalDetector;
     private CascadeClassifier profileDetector;
@@ -61,7 +65,7 @@ public class FaceDetector {
         Mat image = Highgui.imread(imageURL);
 
         MatOfRect faceDetections = new MatOfRect();
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 6, 10, minSize, maxSize);
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
 
         int detected = faceDetections.toArray().length;
 
@@ -88,7 +92,7 @@ public class FaceDetector {
 
         MatOfRect faceDetections = new MatOfRect();
         log.info("FaceDetector param : scale=1.05-neigh=3");
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
 
@@ -113,7 +117,7 @@ public class FaceDetector {
     public BufferedImage detectFacesToBufferedImage(Mat image) {
 
         MatOfRect faceDetections = new MatOfRect();
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
 
@@ -160,7 +164,12 @@ public class FaceDetector {
     public Mat cropFaceToMat(Mat image) {
 
         MatOfRect faceDetections = new MatOfRect();
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, CV_HAAR_DO_CANNY_PRUNING
+            |CV_HAAR_FIND_BIGGEST_OBJECT
+            //|CV_HAAR_DO_ROUGH_SEARCH
+            //|CV_HAAR_DO_CANNY_PRUNING
+            |CV_HAAR_SCALE_IMAGE
+            , minSize, maxSize);
         int detected = faceDetections.toArray().length;
         if (detected == 0){
             log.info("FaceDetector try Profile");
