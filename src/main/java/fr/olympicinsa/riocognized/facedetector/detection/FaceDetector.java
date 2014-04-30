@@ -136,7 +136,7 @@ public class FaceDetector {
     public BufferedImage cropFaceToBufferedImage(Mat image) {
 
         MatOfRect faceDetections = new MatOfRect();
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
         if (faceDetections.toArray().length > 0) {
@@ -160,7 +160,7 @@ public class FaceDetector {
     public Mat cropFaceToMat(Mat image) {
 
         MatOfRect faceDetections = new MatOfRect();
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 10, minSize, maxSize);
+        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         if (detected == 0){
             log.info("FaceDetector try Profile");

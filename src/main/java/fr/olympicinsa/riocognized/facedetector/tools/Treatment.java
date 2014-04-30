@@ -6,15 +6,22 @@
 package fr.olympicinsa.riocognized.facedetector.tools;
 
 import com.googlecode.javacv.cpp.opencv_core;
+import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32F;
 import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
+import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32S;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import static com.googlecode.javacv.cpp.opencv_core.cvConvertScale;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateImage;
 import static com.googlecode.javacv.cpp.opencv_core.cvSize;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_AREA;
+import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_NN;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvEqualizeHist;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
 import static fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer.log;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.opencv.core.Mat;
 import static org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY;
 import static org.opencv.imgproc.Imgproc.cvtColor;
@@ -52,23 +59,26 @@ public class Treatment {
     public static IplImage beforeRecognition(opencv_core.IplImage image, int x, int y) {
 
         // Create empty image
-        final IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_8U, 1);
-        final IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
+        final IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_32F, 1);
+        final IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_32F, 1);
+        
         log.debug("Convert to Grayscale");
         cvConvertScale(image, gray, 1. / 255, 0);
         log.debug("Resizing image");
-        cvResize(gray, resized, CV_INTER_AREA);
-        log.debug("Egalisation");
-        cvEqualizeHist(resized, resized);
+        
+        cvResize(gray, resized, CV_INTER_NN);
+        //log.debug("Egalisation");
+        //cvEqualizeHist(resized, resized);
 
         /* Write gray scale resized image
          BufferedImage write = resized.getBufferedImage();
          try {
-         ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl"+image.toString()+".jpg"));
+         ImageIO.write(write, "jpg", new File("testIpl.jpg"));
          } catch (IOException e) {
-            
+             log.error("Can't write ");
+            e.printStackTrace();
          }
-         */
+        */
         return resized;
     }
 }
