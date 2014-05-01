@@ -7,8 +7,11 @@ import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_SCALE_IMAGE;
 import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
+import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.resize;
+import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.showResult;
 import java.awt.image.BufferedImage;
 import static java.lang.System.exit;
+import java.util.Date;
 import org.apache.log4j.Logger;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -18,20 +21,26 @@ import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
 public class FaceDetector {
 
     public static Logger log = Logger.getLogger(FaceDetector.class);
 
-    public final static String CASCADE_FRONTAL_DEFAULT = "haarcascade_frontalface_alt.xml";
+    public final static String DEBUG_OUTPUT_FILE = "detected.jpg";
+    public final static String CASCADE_FRONTAL_ALT = "haarcascade_frontalface_alt.xml";
+    public final static String CASCADE_FRONTAL_DEFAULT = "haarcascade_frontalface_default.xml";
     public final static String CASCADE_PROFILEFACE = "haarcascade_profileface.xml";
-    public final static String CASCADE_FRONTALEFACE = "haarcascade_frontalface_alt2.xml";
-    public Size minSize = new Size(15,15);
-    public Size maxSize = new Size(500,500);
+    public final static String CASCADE_FRONTAL_ALT2 = "haarcascade_frontalface_alt2.xml";
+    public final static String CASCADE_EYES = "haarcascade_eye_tree_eyeglasses.xml";
+    public final static int MAX_WIDTH = 500;
+    public Size minSize = new Size(30, 30);
+    public Size maxSize = new Size(500, 500);
     private int facesDetected;
     private CascadeClassifier frontalDetector;
     private CascadeClassifier profileDetector;
+    private CascadeClassifier eyesDetector;
     private static OpenCV openCV;
 
     /**
@@ -42,9 +51,10 @@ public class FaceDetector {
         openCV = OpenCV.getInstance();
         //Load Haar Cascade Classifier
         try {
-            log.info("FaceDetector use : " +  CASCADE_FRONTAL_DEFAULT);
+            log.info("FaceDetector use : " + CASCADE_FRONTAL_DEFAULT);
             frontalDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_FRONTAL_DEFAULT);
             profileDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_PROFILEFACE);
+            eyesDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_EYES);
         } catch (Exception e) {
             log.error("Can't create FaceDetector");
             exit(0);
@@ -162,32 +172,69 @@ public class FaceDetector {
      * @return Mat of detected face
      */
     public Mat cropFaceToMat(Mat image) {
-
+        Mat imageR = resize(image, MAX_WIDTH);
         MatOfRect faceDetections = new MatOfRect();
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, CV_HAAR_DO_CANNY_PRUNING
-            |CV_HAAR_FIND_BIGGEST_OBJECT
+        Rect faceRect = new Rect();
+        frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
+            //| CV_HAAR_FIND_BIGGEST_OBJECT
             //|CV_HAAR_DO_ROUGH_SEARCH
-            //|CV_HAAR_DO_CANNY_PRUNING
-            |CV_HAAR_SCALE_IMAGE
-            , minSize, maxSize);
+            | CV_HAAR_DO_CANNY_PRUNING
+            | CV_HAAR_SCALE_IMAGE, minSize, maxSize);
         int detected = faceDetections.toArray().length;
-        if (detected == 0){
+        if (detected == 0) {
             log.info("FaceDetector try Profile");
-            log.info("FaceDetector use : " +  CASCADE_PROFILEFACE);
-            frontalDetector.load(CASCADE_PROFILEFACE);// = profileDetector;
-            frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
+            log.info("FaceDetector use : " + CASCADE_PROFILEFACE);
+            eyesDetector.detectMultiScale(imageR, faceDetections,1.1, 2, 0, new Size(5, 5), new Size(20,20));
             detected = faceDetections.toArray().length;
         }
         this.facesDetected = detected;
         if (detected > 0) {
-            Rect rect = faceDetections.toArray()[0];
-            Rect rectCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
-            Mat cropImage = new Mat(image, rectCrop);
+            for (Rect rect : faceDetections.toArray()) {
+                Core.rectangle(imageR, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
+                    new Scalar(0, 255, 0));
+            }
+            //showResult(imageR);
+            Highgui.imwrite(DEBUG_OUTPUT_FILE, imageR);
+            if (detected > 1) {
+                log.info("Select face using eyes");
+                for (Rect rect : faceDetections.toArray()) {
+                    if (hasEyes(rect, imageR)) {
+                        faceRect = rect;
+                    }
+                }
+            }
+            faceRect = faceDetections.toArray()[0];
+            Rect rectCrop = new Rect(faceRect.x, faceRect.y, faceRect.width, faceRect.height);
+            Mat cropImage = new Mat(imageR, rectCrop);
             Mat grayScaled = Treatment.beforeDetection(cropImage);
             return grayScaled;
         } else {
             return null;
         }
+    }
+
+    public boolean hasEyes(Rect facesArray, Mat frame) {
+        Point center = new Point(facesArray.x + facesArray.width * 0.5, facesArray.y + facesArray.height * 0.5);
+        //Core.ellipse(frame, center, new Size(facesArray.width * 0.5, facesArray.height * 0.5), 0, 0, 360, new Scalar(255, 0, 255), 4, 8, 0);
+
+        Mat faceROI = frame.submat(facesArray);
+        MatOfRect eyes = new MatOfRect();
+
+        eyesDetector.detectMultiScale(faceROI, eyes, 1.1, 1, 0, new Size(5, 5), new Size(20,20));
+        log.info("EyesDetector detect :" + eyes.toArray().length);
+        Rect[] eyesArray = eyes.toArray();
+        for (int j = 0; j < eyesArray.length; j++) {
+            Point center1 = new Point(facesArray.x + eyesArray[j].x + eyesArray[j].width * 0.5, facesArray.y + eyesArray[j].y + eyesArray[j].height * 0.5);
+            int radius = (int) Math.round((eyesArray[j].width + eyesArray[j].height) * 0.25);
+            Core.circle(frame, center1, radius, new Scalar(255, 0, 0), 4, 2, 0);
+            Highgui.imwrite(DEBUG_OUTPUT_FILE + eyesArray[j].x + ".jpg", frame);
+        }
+        if (eyesArray.length > 0) {
+            log.info("EyesDetected = true");
+            return true;
+        }
+        log.info("EyesDetected = false");
+        return false;
     }
 
     /**
