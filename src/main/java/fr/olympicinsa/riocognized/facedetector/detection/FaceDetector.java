@@ -10,6 +10,8 @@ import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
 import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.resize;
 import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.showResult;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import static java.lang.System.exit;
 import java.util.Date;
 import org.apache.log4j.Logger;
@@ -28,7 +30,7 @@ public class FaceDetector {
 
     public static Logger log = Logger.getLogger(FaceDetector.class);
 
-    public final static String DEBUG_OUTPUT_FILE = "detected.jpg";
+    public final static String DEBUG_OUTPUT_FILE = "detected";
     public final static String CASCADE_FRONTAL_ALT = "haarcascade_frontalface_alt.xml";
     public final static String CASCADE_FRONTAL_DEFAULT = "haarcascade_frontalface_default.xml";
     public final static String CASCADE_PROFILEFACE = "haarcascade_profileface.xml";
@@ -36,7 +38,7 @@ public class FaceDetector {
     public final static String CASCADE_EYES = "haarcascade_eye.xml";
     public final static int MAX_WIDTH = 500;
     public Size minSize = new Size(40, 40);
-    public Size maxSize = new Size(200, 200);
+    public Size maxSize = new Size(400,400);
     private int facesDetected;
     private CascadeClassifier frontalDetector;
     private CascadeClassifier profileDetector;
@@ -51,7 +53,6 @@ public class FaceDetector {
         openCV = OpenCV.getInstance();
         //Load Haar Cascade Classifier
         try {
-            log.info("FaceDetector use : " + CASCADE_FRONTAL_ALT);
             frontalDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_FRONTAL_ALT);
             profileDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_PROFILEFACE);
             eyesDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_EYES);
@@ -180,6 +181,7 @@ public class FaceDetector {
         MatOfRect faceDetections = new MatOfRect();
         Rect faceRect = null;
         //hasEyes(imageR);
+        log.info("FaceDetector use : " + CASCADE_FRONTAL_ALT);
         frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
             //| CV_HAAR_FIND_BIGGEST_OBJECT
             //|CV_HAAR_DO_ROUGH_SEARCH
@@ -187,9 +189,16 @@ public class FaceDetector {
             , minSize, maxSize);
         int detected = faceDetections.toArray().length;
         if (detected == 0) {
-            log.info("FaceDetector try Profile");
-            log.info("FaceDetector use : " + CASCADE_PROFILEFACE);
-            eyesDetector.detectMultiScale(imageR, faceDetections, 1.1, 2, 0, new Size(5, 5), new Size(20, 20));
+            log.info("No face found");
+            log.info("FaceDetector try with another filter");
+            log.info("FaceDetector use : " + CASCADE_FRONTAL_DEFAULT);
+            frontalDetector.load(openCV.getLibraryPath() + CASCADE_FRONTAL_DEFAULT);
+            frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
+            //| CV_HAAR_FIND_BIGGEST_OBJECT
+            //|CV_HAAR_DO_ROUGH_SEARCH
+            | CV_HAAR_DO_CANNY_PRUNING //| CV_HAAR_SCALE_IMAGE
+            , minSize, maxSize);
+            //eyesDetector.detectMultiScale(imageR, faceDetections, 1.1, 2, 0, new Size(5, 5), new Size(20, 20));
             detected = faceDetections.toArray().length;
         }
         this.facesDetected = detected;
@@ -199,7 +208,13 @@ public class FaceDetector {
                     new Scalar(0, 255, 0));
             }
             //showResult(imageR);
-            Highgui.imwrite(DEBUG_OUTPUT_FILE, imageR);
+            try {
+            String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
+            Highgui.imwrite(debug, imageR);
+            log.info("Faces detected writed to: " + debug);
+            } catch (IOException e){
+                log.error("Can't write debug face detected image");
+            }
             if (detected > 1) {
                 log.info("Select face using eyes");
                 for (Rect rect : faceDetections.toArray()) {
