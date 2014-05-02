@@ -7,6 +7,7 @@ import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.System.exit;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +20,7 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/brownlee.jpg";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/teddy.jpg";
     public static String DIR_TO_RECOGNIZE = "/opt/openCV";
 
     public static void main(String[] args) {
@@ -72,6 +73,7 @@ public class Riocognized {
             
         } catch (IOException e) {
             log.error("File not found");
+            exit(0);
             athletePath = Riocognized.class.getResource("/image.jpg").getPath();
         }
         recognizeTest(imageParam, FilenameUtils.removeExtension(f.getName()),recognizor);
