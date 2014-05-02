@@ -38,7 +38,7 @@ public class FaceDetector {
     public final static String CASCADE_EYES = "haarcascade_eye.xml";
     public final static int MAX_WIDTH = 500;
     public Size minSize = new Size(40, 40);
-    public Size maxSize = new Size(400,400);
+    public Size maxSize = new Size(400, 400);
     private int facesDetected;
     private CascadeClassifier frontalDetector;
     private CascadeClassifier profileDetector;
@@ -102,23 +102,44 @@ public class FaceDetector {
     public int detectFaces(Mat image, String output) {
         Mat imageR = resize(image, MAX_WIDTH);
         MatOfRect faceDetections = new MatOfRect();
-        log.info("FaceDetector param : scale=1.1-neigh=3");
+        log.info("FaceDetector use : " + CASCADE_FRONTAL_ALT);
         frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
             //| CV_HAAR_FIND_BIGGEST_OBJECT
             //|CV_HAAR_DO_ROUGH_SEARCH
             | CV_HAAR_DO_CANNY_PRUNING //| CV_HAAR_SCALE_IMAGE
             , minSize, maxSize);
         int detected = faceDetections.toArray().length;
+        if (detected == 0) {
+            log.info("No face found");
+            log.info("FaceDetector try with another filter");
+            log.info("FaceDetector use : " + CASCADE_FRONTAL_DEFAULT);
+            frontalDetector.load(openCV.getLibraryPath() + CASCADE_FRONTAL_DEFAULT);
+            frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
+                //| CV_HAAR_FIND_BIGGEST_OBJECT
+                //|CV_HAAR_DO_ROUGH_SEARCH
+                | CV_HAAR_DO_CANNY_PRUNING //| CV_HAAR_SCALE_IMAGE
+                , minSize, maxSize);
+            //eyesDetector.detectMultiScale(imageR, faceDetections, 1.1, 2, 0, new Size(5, 5), new Size(20, 20));
+            detected = faceDetections.toArray().length;
+        }
         this.facesDetected = detected;
-
-        //Frame recognized athlete faces
-        for (Rect rect : faceDetections.toArray()) {
-            Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
-                new Scalar(0, 255, 0));
+        if (detected > 0) {
+            for (Rect rect : faceDetections.toArray()) {
+                Core.rectangle(imageR, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
+                    new Scalar(0, 255, 0));
+            }
+            //showResult(imageR);
+            try {
+                String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
+                Highgui.imwrite(debug, imageR);
+                log.info("Faces detected writed to: " + debug);
+            } catch (IOException e) {
+                log.error("Can't write debug face detected image");
+            }
         }
 
         //Write new file
-        Highgui.imwrite(output, image);
+        Highgui.imwrite(output, imageR);
 
         return detected;
     }
@@ -194,10 +215,10 @@ public class FaceDetector {
             log.info("FaceDetector use : " + CASCADE_FRONTAL_DEFAULT);
             frontalDetector.load(openCV.getLibraryPath() + CASCADE_FRONTAL_DEFAULT);
             frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
-            //| CV_HAAR_FIND_BIGGEST_OBJECT
-            //|CV_HAAR_DO_ROUGH_SEARCH
-            | CV_HAAR_DO_CANNY_PRUNING //| CV_HAAR_SCALE_IMAGE
-            , minSize, maxSize);
+                //| CV_HAAR_FIND_BIGGEST_OBJECT
+                //|CV_HAAR_DO_ROUGH_SEARCH
+                | CV_HAAR_DO_CANNY_PRUNING //| CV_HAAR_SCALE_IMAGE
+                , minSize, maxSize);
             //eyesDetector.detectMultiScale(imageR, faceDetections, 1.1, 2, 0, new Size(5, 5), new Size(20, 20));
             detected = faceDetections.toArray().length;
         }
@@ -209,10 +230,10 @@ public class FaceDetector {
             }
             //showResult(imageR);
             try {
-            String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
-            Highgui.imwrite(debug, imageR);
-            log.info("Faces detected writed to: " + debug);
-            } catch (IOException e){
+                String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
+                Highgui.imwrite(debug, imageR);
+                log.info("Faces detected writed to: " + debug);
+            } catch (IOException e) {
                 log.error("Can't write debug face detected image");
             }
             if (detected > 1) {
