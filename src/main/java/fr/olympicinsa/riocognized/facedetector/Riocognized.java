@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.opencv.core.Mat;
@@ -18,7 +19,8 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/brownlee4.jpg";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/brownlee.jpg";
+    public static String DIR_TO_RECOGNIZE = "/opt/openCV";
 
     public static void main(String[] args) {
 
@@ -28,7 +30,7 @@ public class Riocognized {
         DateFormat dateFormat = new SimpleDateFormat("hhmmss-dd-MM-yy");
         Date date = new Date();
         String dateString = dateFormat.format(date);
-        Mat image;
+
         String athletePath;
         FaceDBReader faceDB;
 
@@ -47,6 +49,19 @@ public class Riocognized {
         recognizor.save();
 
         log.info("Initialize Riocognized FaceDetector");
+
+        File repertoire = new File(DIR_TO_RECOGNIZE);
+        String fileOutput = null;
+        if (repertoire.isDirectory()) {
+            File[] list = repertoire.listFiles();
+            for (File file : list) {
+                if (file.getName().matches("(.*)jpg")) {
+                    fileOutput = file.getAbsolutePath();
+                    String fileName = FilenameUtils.removeExtension(file.getName());
+                    recognizeTest(fileOutput, fileName, recognizor);
+                }
+            }
+        }
         String imageParam = (args.length > 0) ? args[0] : IMAGE_TO_RECOGNIZE;
 
         try {
@@ -59,17 +74,23 @@ public class Riocognized {
             log.error("File not found");
             athletePath = Riocognized.class.getResource("/image.jpg").getPath();
         }
-        log.info("Utilisation du fichier : " + athletePath);
-        log.info("Start FaceDetector");
+    }
+
+    public static void recognizeTest(String fileOutput, String filename, RioRecognizer recognizor) {
+        Mat image;
+        log.info(
+            "Utilisation du fichier : " + fileOutput);
+        log.info(
+            "Start FaceDetector");
         try {
             FaceDetector faceDetector = new FaceDetector();
-            image = Highgui.imread(athletePath);
+            image = Highgui.imread(fileOutput);
             try {
                 //crop face
                 Mat crop = faceDetector.cropFaceToMat(image);
                 log.info("Detected " + faceDetector.getFacesDetected() + " athletes !");
                 if (faceDetector.getFacesDetected() > 0) {
-                    Highgui.imwrite("face_croped.jpg", crop);
+                    Highgui.imwrite(filename + "_croped.jpg", crop);
                     IplImage face = ImageConvertor.matToIplImage(crop);
                     for (int i = 0; i < 5; i++) {
                         int athlete = recognizor.predictedLabel(face);
@@ -88,5 +109,4 @@ public class Riocognized {
         }
 
     }
-
 }
