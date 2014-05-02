@@ -33,7 +33,7 @@ public class FaceDetector {
     public final static String CASCADE_FRONTAL_DEFAULT = "haarcascade_frontalface_default.xml";
     public final static String CASCADE_PROFILEFACE = "haarcascade_profileface.xml";
     public final static String CASCADE_FRONTAL_ALT2 = "haarcascade_frontalface_alt2.xml";
-    public final static String CASCADE_EYES = "haarcascade_eye_tree_eyeglasses.xml";
+    public final static String CASCADE_EYES = "haarcascade_eye.xml";
     public final static int MAX_WIDTH = 500;
     public Size minSize = new Size(30, 30);
     public Size maxSize = new Size(500, 500);
@@ -175,6 +175,7 @@ public class FaceDetector {
         Mat imageR = resize(image, MAX_WIDTH);
         MatOfRect faceDetections = new MatOfRect();
         Rect faceRect = new Rect();
+        //hasEyes(imageR);
         frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
             //| CV_HAAR_FIND_BIGGEST_OBJECT
             //|CV_HAAR_DO_ROUGH_SEARCH
@@ -184,7 +185,7 @@ public class FaceDetector {
         if (detected == 0) {
             log.info("FaceDetector try Profile");
             log.info("FaceDetector use : " + CASCADE_PROFILEFACE);
-            eyesDetector.detectMultiScale(imageR, faceDetections,1.1, 2, 0, new Size(5, 5), new Size(20,20));
+            eyesDetector.detectMultiScale(imageR, faceDetections, 1.1, 2, 0, new Size(5, 5), new Size(20, 20));
             detected = faceDetections.toArray().length;
         }
         this.facesDetected = detected;
@@ -198,7 +199,7 @@ public class FaceDetector {
             if (detected > 1) {
                 log.info("Select face using eyes");
                 for (Rect rect : faceDetections.toArray()) {
-                    if (hasEyes(rect, imageR)) {
+                    if (faceHasEyes(rect, imageR)) {
                         faceRect = rect;
                     }
                 }
@@ -212,15 +213,22 @@ public class FaceDetector {
             return null;
         }
     }
-
-    public boolean hasEyes(Rect facesArray, Mat frame) {
+    
+    /**
+     * Detected eyes present in Mat image in a specified zone
+     *
+     * @param frame Mat of type CV_8UC3 or CV_8UC1
+     * @param facesArray Rect where to find eyes in the frame
+     * @return boolean true if detected
+     */
+    public boolean faceHasEyes(Rect facesArray, Mat frame) {
         Point center = new Point(facesArray.x + facesArray.width * 0.5, facesArray.y + facesArray.height * 0.5);
         //Core.ellipse(frame, center, new Size(facesArray.width * 0.5, facesArray.height * 0.5), 0, 0, 360, new Scalar(255, 0, 255), 4, 8, 0);
 
         Mat faceROI = frame.submat(facesArray);
         MatOfRect eyes = new MatOfRect();
 
-        eyesDetector.detectMultiScale(faceROI, eyes, 1.1, 1, 0, new Size(5, 5), new Size(20,20));
+        eyesDetector.detectMultiScale(faceROI, eyes, 1.1, 1, 0, new Size(5, 5), new Size(20, 20));
         log.info("EyesDetector detect :" + eyes.toArray().length);
         Rect[] eyesArray = eyes.toArray();
         for (int j = 0; j < eyesArray.length; j++) {
@@ -234,6 +242,33 @@ public class FaceDetector {
             return true;
         }
         log.info("EyesDetected = false");
+        return false;
+    }
+    
+    /**
+     * Detected eyes present in Mat image
+     *
+     * @param frame Mat of type CV_8UC3 or CV_8UC1
+     * @return boolean true if detected
+     */
+    public boolean hasEyes(Mat frame) {
+        Mat faceROI = frame;
+        MatOfRect eyes = new MatOfRect();
+
+        eyesDetector.detectMultiScale(faceROI, eyes, 1.1, 1, 0, new Size(5, 5), new Size(20, 20));
+        log.info("EyesDetector detect :" + eyes.toArray().length);
+        Rect[] eyesArray = eyes.toArray();
+        for (int j = 0; j < eyesArray.length; j++) {
+            Point center1 = new Point(eyesArray[j].x + eyesArray[j].width * 0.5,  eyesArray[j].y + eyesArray[j].height * 0.5);
+            int radius = (int) Math.round((eyesArray[j].width + eyesArray[j].height) * 0.25);
+            Core.circle(frame, center1, radius, new Scalar(255, 0, 0), 4, 2, 0);
+        }
+        Highgui.imwrite("EYES_" + DEBUG_OUTPUT_FILE + ".jpg", frame);
+        if (eyesArray.length > 0) {
+            log.info("Image EyesDetected = true");
+            return true;
+        }
+        log.info("Image EyesDetected = false");
         return false;
     }
 
