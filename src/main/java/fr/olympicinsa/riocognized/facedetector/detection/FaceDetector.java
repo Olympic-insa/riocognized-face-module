@@ -99,10 +99,14 @@ public class FaceDetector {
      * @return int of detected faces
      */
     public int detectFaces(Mat image, String output) {
-
+        Mat imageR = resize(image, MAX_WIDTH);
         MatOfRect faceDetections = new MatOfRect();
-        log.info("FaceDetector param : scale=1.05-neigh=3");
-        frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
+        log.info("FaceDetector param : scale=1.1-neigh=3");
+        frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
+            //| CV_HAAR_FIND_BIGGEST_OBJECT
+            //|CV_HAAR_DO_ROUGH_SEARCH
+            | CV_HAAR_DO_CANNY_PRUNING
+            | CV_HAAR_SCALE_IMAGE, minSize, maxSize);
         int detected = faceDetections.toArray().length;
         this.facesDetected = detected;
 
@@ -213,7 +217,7 @@ public class FaceDetector {
             return null;
         }
     }
-    
+
     /**
      * Detected eyes present in Mat image in a specified zone
      *
@@ -244,7 +248,7 @@ public class FaceDetector {
         log.info("EyesDetected = false");
         return false;
     }
-    
+
     /**
      * Detected eyes present in Mat image
      *
@@ -259,7 +263,7 @@ public class FaceDetector {
         log.info("EyesDetector detect :" + eyes.toArray().length);
         Rect[] eyesArray = eyes.toArray();
         for (int j = 0; j < eyesArray.length; j++) {
-            Point center1 = new Point(eyesArray[j].x + eyesArray[j].width * 0.5,  eyesArray[j].y + eyesArray[j].height * 0.5);
+            Point center1 = new Point(eyesArray[j].x + eyesArray[j].width * 0.5, eyesArray[j].y + eyesArray[j].height * 0.5);
             int radius = (int) Math.round((eyesArray[j].width + eyesArray[j].height) * 0.25);
             Core.circle(frame, center1, radius, new Scalar(255, 0, 0), 4, 2, 0);
         }
