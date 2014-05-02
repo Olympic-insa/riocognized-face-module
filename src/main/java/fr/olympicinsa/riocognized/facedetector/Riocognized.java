@@ -63,17 +63,18 @@ public class Riocognized {
             }
         }
         String imageParam = (args.length > 0) ? args[0] : IMAGE_TO_RECOGNIZE;
-
+        File f = new File(imageParam);
         try {
-            File f = new File(imageParam);
             if (!f.exists()) {
                 throw new IOException();
             }
             athletePath = imageParam;
+            
         } catch (IOException e) {
             log.error("File not found");
             athletePath = Riocognized.class.getResource("/image.jpg").getPath();
         }
+        recognizeTest(imageParam, FilenameUtils.removeExtension(f.getName()),recognizor);
     }
 
     public static void recognizeTest(String fileOutput, String filename, RioRecognizer recognizor) {
