@@ -5,6 +5,7 @@ import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
+import static fr.olympicinsa.riocognized.facedetector.Riocognized.log;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
 import fr.olympicinsa.riocognized.facedetector.exception.FaceDBException;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
@@ -12,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.System.exit;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,52 +43,53 @@ public class Test {
         //System.load("/opt/openCV/libopencv_java248.so");
         //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         //Test FaceDBReader
-        log.info("Testing FaceDBReader");
-        FaceDBReader faceDB = new FaceDBReader("/opt/openCV/faces.csv");
-        for (String[] faces : faceDB.getFaces()) {
-            log.debug(faces[0] + ";" + faces[1]);
-        }
-        List<String[]> data = new ArrayList<>();
-        data.add(new String[]{"India", "New Delhi"});
-        data.add(new String[]{"United States", "Washington D.C"});
-        data.add(new String[]{"Germany", "Berlin"});
-        faceDB.setList(data);
-        faceDB.addFace(new String[]{"Germany", "Berlin"});
         try {
-        faceDB.writeFile();
+            log.info("Testing FaceDBReader");
+            FaceDBReader faceDB = new FaceDBReader("/opt/openCV/faces.csv");
+            for (String[] faces : faceDB.getFaces()) {
+                log.debug(faces[0] + ";" + faces[1]);
+            }
+            List<String[]> data = new ArrayList<>();
+            data.add(new String[]{"India", "New Delhi"});
+            data.add(new String[]{"United States", "Washington D.C"});
+            data.add(new String[]{"Germany", "Berlin"});
+            faceDB.setList(data);
+            faceDB.addFace(new String[]{"Germany", "Berlin"});
+
+            faceDB.writeFile();
+
+            log.info("Test FaceDB OK !");
+            // Test RioRecognizer
+            log.info("Testing RioRecognizer");
+            String path = "/opt/openCV/test.yml";
+            //Load faceDB
+            faceDB = new FaceDBReader("/opt/openCV/athleteDB/faces.csv");
+            //Create  Recognizor
+            log.info("Create Recognizer");
+            RioRecognizer recognizor = new RioRecognizer(faceDB, path);
+            //Store faces
+            log.info("Read CSV en load images");
+            recognizor.init();
+            log.info("Create Recognizer Eigenfaces (PCA)");
+            recognizor.train();
+            log.info("Save Recognizer Eigenfaces");
+            recognizor.save();
+
+            IplImage toTest = cvLoadImage("/opt/openCV/2.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+
+            /* Write just grayscaled  loaded test image 
+             BufferedImage write = toTest.getBufferedImage();
+             try {
+             ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl.jpg"));
+             } catch (IOException e)            
+             }
+             */
+            int athlete = recognizor.predictedLabel(toTest);
+            System.out.println("\nAthlete recognized : " + athlete + "\n");
         } catch (FaceDBException e) {
-            log.error("Test FaceDB Error !");
-            e.printStackTrace();
+            log.error("Can't read/create faceDB csv");
+            exit(0);
         }
-        log.info("Test FaceDB OK !");
-
-        // Test RioRecognizer
-        log.info("Testing RioRecognizer");
-        String path = "/opt/openCV/test.yml";
-        //Load faceDB
-        faceDB = new FaceDBReader("/opt/openCV/athleteDB/faces.csv");
-        //Create  Recognizor
-        log.info("Create Recognizer");
-        RioRecognizer recognizor = new RioRecognizer(faceDB, path);
-        //Store faces
-        log.info("Read CSV en load images");
-        recognizor.init();
-        log.info("Create Recognizer Eigenfaces (PCA)");
-        recognizor.train();
-        log.info("Save Recognizer Eigenfaces");
-        recognizor.save();
-
-        IplImage toTest = cvLoadImage("/opt/openCV/2.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-
-        /* Write just grayscaled  loaded test image 
-         BufferedImage write = toTest.getBufferedImage();
-         try {
-         ImageIO.write(write, "jpg", new File("/opt/openCV/testIpl.jpg"));
-         } catch (IOException e)            
-         }
-         */
-        int athlete = recognizor.predictedLabel(toTest);
-        System.out.println("\nAthlete recognized : " + athlete + "\n");
 
         log.info("Testing Riocognized FaceDetector");
         String imageParam = (args.length > 0) ? args[0] : "/opt/openCV/image.jpg";
@@ -144,7 +147,7 @@ public class Test {
             e.printStackTrace();
         }
     }
-    
+
     public static void debugIplImage(IplImage i) {
         log.info("****** Debug Image **********");
         log.info("Depht : " + i.depth());
