@@ -35,7 +35,7 @@ public class FaceDBReader {
      *
      * @param faceDB String of path to csv file
      */
-    public FaceDBReader(String faceDB) {
+    public FaceDBReader(String faceDB) throws FaceDBException {
         pathDB = faceDB;
         faces = new ArrayList<>();
         File file = new File(pathDB);
@@ -46,6 +46,7 @@ public class FaceDBReader {
             faces = readFile(pathDB);
         } catch (IOException | FaceDBException e) {
             log.error("Can't read/create faceDB csv");
+            throw new FaceDBException("Can't find csv file", e);
         }
     }
 
