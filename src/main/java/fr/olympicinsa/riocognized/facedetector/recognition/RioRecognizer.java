@@ -42,10 +42,10 @@ public class RioRecognizer {
     private MatVector imagesDB;
     private int[] athletes;
     private FaceRecognizer eigenRecognizer;
-    
+
     private int[] athlete = new int[1];
     private double distance[] = new double[1];
-    
+
     /**
      * Constructor for FaceRecognizer
      *
@@ -58,34 +58,31 @@ public class RioRecognizer {
         this.faceDatabase = db;
         this.savePath = out;
         //this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
-        log.info("Create LBPH Recognizer (2, 8, 8, 8, 200)");
-        this.eigenRecognizer = createLBPHFaceRecognizer(2, 8, 8, 8, 200);
+        log.info("Create Fischer Recognizer");
+        eigenRecognizer = createFisherFaceRecognizer();
     }
+
     /**
      * Switch to an other algorithm
      */
     public void changeRecognizer(int nRec) {
         switch (nRec) {
-            case 0:
+            case 2:
                 log.info("Create LBPH FaceRecognizer (1,8,8,8,100)");
                 eigenRecognizer = createLBPHFaceRecognizer(1, 8, 8, 8, 100);
                 break;
-            case 1:
+            case 3:
                 log.info("Create Fischer Recognizer");
-                ;
                 eigenRecognizer = createFisherFaceRecognizer();
                 break;
-            case 2:
+            case 0:
                 log.info("Create EigenRecognizer");
                 eigenRecognizer = createEigenFaceRecognizer();
                 break;
-            case 3:
-                log.info("Create Eigen Recognizer (" + EIGEN_SIZE + "/" + THREASHOLD+")");
-                this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
-                break;
-            case 4:
+            case 1:
                 log.info("Create LBPH Recognizer (2, 8, 8, 8, 200)");
                 this.eigenRecognizer = createLBPHFaceRecognizer(2, 8, 8, 8, 200);
+                break;
         }
         train();
 
@@ -180,26 +177,30 @@ public class RioRecognizer {
         eigenRecognizer.load(path);
         log.info("Face Recognizer loaded from " + path);
     }
-    
+
     /**
      * Get Precision of detection
+     *
      * @return double[] of precision
      */
     public double[] getPrecision() {
-        if (distance != null)
+        if (distance != null) {
             return distance;
-        else
+        } else {
             return null;
+        }
     }
-    
+
     /**
      * Get Result of detection
+     *
      * @return int[] of recognized athletes
      */
     public int[] getResult() {
-        if (athlete != null)
+        if (athlete != null) {
             return athlete;
-        else
+        } else {
             return null;
+        }
     }
 }

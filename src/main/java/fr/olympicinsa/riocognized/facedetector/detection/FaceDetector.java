@@ -58,7 +58,6 @@ public class FaceDetector {
             eyesDetector = new CascadeClassifier(openCV.getLibraryPath() + CASCADE_EYES);
         } catch (Exception e) {
             log.error("Can't create FaceDetector");
-            exit(0);
         }
     }
 
@@ -228,6 +227,10 @@ public class FaceDetector {
                 Core.rectangle(imageR, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
                     new Scalar(0, 255, 0));
             }
+            
+           /*
+            * For debugging purpose. Write temp file with all detected face in image
+            *
             //showResult(imageR);
             try {
                 String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
@@ -236,6 +239,9 @@ public class FaceDetector {
             } catch (IOException e) {
                 log.error("Can't write debug face detected image");
             }
+            
+            */
+            
             if (detected > 1) {
                 log.info("Select face using eyes");
                 for (Rect rect : faceDetections.toArray()) {
@@ -269,7 +275,7 @@ public class FaceDetector {
     public boolean faceHasEyes(Rect facesArray, Mat frame) {
         Point center = new Point(facesArray.x + facesArray.width * 0.5, facesArray.y + facesArray.height * 0.5);
         Mat face = frame.clone();
-        Mat faceROI = frame.submat(facesArray);
+        Mat faceROI = face.submat(facesArray);
         MatOfRect eyes = new MatOfRect();
 
         eyesDetector.detectMultiScale(faceROI, eyes, 1.1, 1, 0, new Size(5, 5), new Size(20, 20));
