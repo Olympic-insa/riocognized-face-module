@@ -6,9 +6,9 @@ Facial recognition module for Riocognized Webservice
 ## Setup OpenCV, JavaCV & JavaCPP
 *And a proper dev environement :smile:*
 
-- You need to get OpenCV sources and compile Library following OpenCV doc :  [OpenCV Installation Guide][1]
+- You need to get OpenCV sources and compile them following OpenCV doc :  [OpenCV Installation Guide][1]
 - Install JavaCPP wrapper : [new doc available here][3]
-- Install JavaCPP wrapper : [new doc available here][2]
+- Install JavaCV wrapper : [new doc available here][2]
 - Restart your labptob
 
 ## Get Riocongized Face Module and compile it, using your favorite IDE
