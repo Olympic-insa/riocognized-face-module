@@ -38,8 +38,8 @@ Result is showed in the console and logged into rio.log file.
 *If your not familiar with .git and Github :octocat:*
 - Watch this [video][5].
 - Please, read this [git cheat sheet][6].
-- Have a look at OpenCV user mailingist [answers.opencv.org][7].
-- Suscribe to JavaCV dev mailingist : [Google Groups][4].
+- Have a look at OpenCV user mailinglist [answers.opencv.org][7].
+- Suscribe to JavaCV dev mailinglist : [Google Groups][4].
 - Ask questions if needed. :email:
 
 ![Alt Text](https://pbs.twimg.com/media/BmoofE-IAAEmrcn.jpg)
