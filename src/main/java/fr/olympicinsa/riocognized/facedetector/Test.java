@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
@@ -39,7 +40,31 @@ public class Test {
         String dateString = dateFormat.format(date);
         Mat image;
         String athletePath;
-
+//        String file = "/opt/openCV/athleteDB/51/face1.jpg";
+//        String id = "145";
+//        try {
+//        FaceDBReader faces = new FaceDBReader("/opt/openCV/athleteDB/faces1.csv");
+//            ArrayList<String[]> list = (ArrayList)faces.readFile("/opt/openCV/athleteDB/faces.csv");
+//            String[] toDelete = {file, id};
+//            Iterator it = list.iterator();
+//            while (it.hasNext()) {
+//                String[] i = (String[])it.next();
+//                if (i[0].equals(file)) {
+//                    it.remove();
+//                }
+//            }
+//            log.info(toDelete);
+//            log.info(list.get(0));
+//            log.info(list.get(0)[0]);
+//            log.info(list.get(0)[1]);
+//            list.remove(toDelete);
+//            list.trimToSize();
+//            log.info(list.toString());
+//            faces.setList(list);
+//            faces.writeFile();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         //System.load("/opt/openCV/libopencv_java248.so");
         //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         //Test FaceDBReader

@@ -230,7 +230,7 @@ public class FaceDetector {
             
            /*
             * For debugging purpose. Write temp file with all detected face in image
-            *
+            */
             //showResult(imageR);
             try {
                 String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
@@ -240,7 +240,7 @@ public class FaceDetector {
                 log.error("Can't write debug face detected image");
             }
             
-            */
+            /**/
             
             if (detected > 1) {
                 log.info("Select face using eyes");
