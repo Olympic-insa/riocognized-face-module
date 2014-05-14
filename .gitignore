@@ -3,3 +3,8 @@ lib
 athletes_detected.png
 target
 *.log
+*.jpg
+*.pgm
+*.png
+*.jpeg
+*.sh
