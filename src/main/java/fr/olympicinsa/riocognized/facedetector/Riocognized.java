@@ -21,7 +21,7 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/fumey5e.jpg";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/fumey5.jpg";
     //public static String DIR_TO_RECOGNIZE = "/opt/openCV/testImage";
     public static String DIR_TO_DB = "/opt/openCV/athleteDB/faces.csv";
 

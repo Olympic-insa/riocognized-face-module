@@ -36,8 +36,8 @@ public class RioRecognizer {
     private final OpenCV opencv;
     // To scall faces
     private final int F = 2;
-    private int x = 60;
-    private int y = 60;
+    private int x = 100;
+    private int y = 100;
 
     private MatVector imagesDB;
     private int[] athletes;
@@ -106,7 +106,7 @@ public class RioRecognizer {
                 img = cvLoadImage(face[0], CV_LOAD_IMAGE_GRAYSCALE);
                 label = face[1];
                 log.debug("Read image(" + counter + ") in " + face[0]);
-                grayImg = Treatment.beforeRecognition(img, x, y);
+                grayImg = Treatment.beforePrediction(img, x, y, 0);
                 imagesDB.put(counter, grayImg);
                 athletes[counter] = new Integer(label);
 
@@ -141,7 +141,7 @@ public class RioRecognizer {
 
         try {
             log.info("Test image is converting FittedGrey scale");
-            IplImage greyPredictImage = Treatment.beforeRecognition(image, x, y);
+            IplImage greyPredictImage = Treatment.beforePrediction(image, x, y, 1);
             log.info("Try to predict ...");
             //result = eigenRecognizer.predict(image);
             eigenRecognizer.predict(greyPredictImage, athlete, distance);
