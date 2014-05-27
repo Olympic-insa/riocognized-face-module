@@ -21,9 +21,9 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/testImage/teddy.jpg";
-    public static String DIR_TO_RECOGNIZE = "/opt/openCV/testImage";
-    public static String DIR_TO_DB = "/opt/openCV/lfwDB/faces.csv";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/fumey5e.jpg";
+    //public static String DIR_TO_RECOGNIZE = "/opt/openCV/testImage";
+    public static String DIR_TO_DB = "/opt/openCV/athleteDB/faces.csv";
 
     public static void main(String[] args) {
 
@@ -86,6 +86,9 @@ public class Riocognized {
             log.error("Can't read/create faceDB csv");
             exit(0);
         }
+    }
+
+    public Riocognized() {
     }
 
     public static void recognizeTest(String fileOutput, String filename, RioRecognizer recognizor) {

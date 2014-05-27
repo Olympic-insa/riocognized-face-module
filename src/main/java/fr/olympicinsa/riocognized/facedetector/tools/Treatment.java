@@ -95,15 +95,15 @@ public class Treatment {
         //log.debug("Egalisation");
         //cvEqualizeHist(resized, resized);
 
-        /* Write gray scale resized image
+        // Write gray scale resized image
          BufferedImage write = resized.getBufferedImage();
          try {
-         ImageIO.write(write, "jpg", new File("testIpl.jpg"));
+         ImageIO.write(write, "jpg", new File("/debugIpl.jpg"));
          } catch (IOException e) {
          log.error("Can't write ");
          e.printStackTrace();
          }
-         */
+         //
         return resized;
     }
 
