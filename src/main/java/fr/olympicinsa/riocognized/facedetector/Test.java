@@ -1,14 +1,11 @@
 package fr.olympicinsa.riocognized.facedetector;
 
-import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
-import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
-import com.googlecode.javacv.cpp.opencv_core.IplImage;
-import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
 import static fr.olympicinsa.riocognized.facedetector.Riocognized.log;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
 import fr.olympicinsa.riocognized.facedetector.exception.FaceDBException;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
+import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -23,8 +20,11 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import static org.bytedeco.javacpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
+import static org.bytedeco.javacpp.opencv_highgui.imread;
+import static org.bytedeco.javacpp.opencv_highgui.imread;
+import static org.bytedeco.javacpp.opencv_highgui.imwrite;
 
 public class Test {
 
@@ -100,7 +100,7 @@ public class Test {
             log.info("Save Recognizer Eigenfaces");
             recognizor.save();
 
-            IplImage toTest = cvLoadImage("/opt/openCV/2.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+            Mat toTest = imread("/opt/openCV/2.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 
             /* Write just grayscaled  loaded test image 
              BufferedImage write = toTest.getBufferedImage();
@@ -129,7 +129,7 @@ public class Test {
         log.info("Test Image Conversion");
         try {
             FaceDetector faceDetector = new FaceDetector();
-            image = Highgui.imread(athletePath);
+            image = imread(athletePath);
 
             //Test Mat to BufferedImage
             BufferedImage bimage = ImageConvertor.matToBufferedImage(image);
@@ -148,7 +148,7 @@ public class Test {
             //Test Byte to Mat
             String outputBM = "/opt/openCV/image_byteToMat.jpg";
             Mat mat = ImageConvertor.byteArrayToMat(Bimage);
-            Highgui.imwrite(outputBM, image);
+            imwrite(outputBM, image);
             log.info("Byte to Mat works !");
 
             //Test Face Detection
@@ -161,7 +161,7 @@ public class Test {
                 log.info("Detected " + detected + " athletes !");
                 //crop face
                 Mat crop = faceDetector.cropFaceToMat(image);
-                Highgui.imwrite("/opt/openCV/face_" + dateString + ".jpg", crop);
+                imwrite("/opt/openCV/face_" + dateString + ".jpg", crop);
 
             } catch (Exception e) {
                 log.error("Error processiong detection");
@@ -173,11 +173,10 @@ public class Test {
         }
     }
 
-    public static void debugIplImage(IplImage i) {
+    public static void debugIplImage(Mat i) {
         log.info("****** Debug Image **********");
         log.info("Depht : " + i.depth());
         log.info("CVsize : " + i.cvSize().toString());
-        log.info("Alpha Channel : " + i.alphaChannel());
         log.info("String : " + i.toString());
         log.info("****************************");
     }

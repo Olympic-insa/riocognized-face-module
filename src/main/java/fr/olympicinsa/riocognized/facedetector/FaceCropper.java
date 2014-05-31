@@ -10,8 +10,11 @@ import java.util.Date;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import static org.bytedeco.javacpp.opencv_highgui.imread;
+import static org.bytedeco.javacpp.opencv_highgui.imread;
+import static org.bytedeco.javacpp.opencv_highgui.imread;
+import static org.bytedeco.javacpp.opencv_highgui.imwrite;
 
 public class FaceCropper {
 
@@ -89,13 +92,13 @@ public class FaceCropper {
             "Utilisation du fichier : " + fileOutput);
         try {
             FaceDetector faceDetector = new FaceDetector();
-            image = Highgui.imread(fileOutput);
+            image = imread(fileOutput);
             try {
                 //crop face
                 Mat crop = faceDetector.cropFaceToMat(image);
                 log.info("Detected " + faceDetector.getFacesDetected() + " athletes !");
                 if (faceDetector.getFacesDetected() > 0) {
-                    Highgui.imwrite(filename + "_croped.jpg", crop);
+                    imwrite(filename + "_croped.jpg", crop);
                     nbDetected++;
                 }
             } catch (Exception e) {

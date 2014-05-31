@@ -5,18 +5,6 @@
  */
 package fr.olympicinsa.riocognized.facedetector.tools;
 
-import com.googlecode.javacv.cpp.opencv_core;
-import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32F;
-import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
-import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32S;
-import com.googlecode.javacv.cpp.opencv_core.IplImage;
-import static com.googlecode.javacv.cpp.opencv_core.cvConvertScale;
-import static com.googlecode.javacv.cpp.opencv_core.cvCreateImage;
-import static com.googlecode.javacv.cpp.opencv_core.cvSize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_AREA;
-import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_NN;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvEqualizeHist;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
 import static fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer.log;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -28,15 +16,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import org.apache.log4j.Logger;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
-import static org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.equalizeHist;
-
+import static org.bytedeco.javacpp.opencv_core.IPL_DEPTH_32F;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Size;
+import static org.bytedeco.javacpp.opencv_highgui.*;
+import org.bytedeco.javacpp.opencv_imgproc;
+import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_INTER_NN;
+import static org.bytedeco.javacpp.opencv_imgproc.INTER_CUBIC;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.bytedeco.javacpp.opencv_imgproc.equalizeHist;
+import static org.bytedeco.javacpp.opencv_imgproc.resize;
 /**
  *
  * @author alex
@@ -60,15 +54,15 @@ public class Treatment {
     }
 
     public static Mat resize(Mat image, int maxW) {
-        Mat resizeImage = new Mat();
-        log.info("Image size: " + image.width() + "," + image.height());
-        double f = (double) image.width() / (double) maxW;
+        log.info("Image size: " + image.size().width() + "," + image.size().height());
+        double f = (double) image.size().width() / (double) maxW;
         log.info("Resize factor : " + f);
-        int w = (int) (image.width() / f);
-        int h = (int) (image.height() / f);
+        int w = (int) (image.size().width() / f);
+        int h = (int) (image.size().height() / f);
         Size sz = new Size(w, h);
+        Mat resizeImage = new Mat(sz);
         log.info("Resizing image to : " + w + "," + h);
-        Imgproc.resize(image, resizeImage, sz);
+        opencv_imgproc.resize(image, resizeImage, sz);
         return resizeImage;
     }
 
@@ -81,19 +75,18 @@ public class Treatment {
      * @param y int of new image height
      * @return IplImage of grayscale fitted image
      */
-    public static IplImage beforeRecognition(opencv_core.IplImage image, int x, int y) {
+    public static Mat beforeRecognition(Mat image, int x, int y) {
 
         // Create empty image
-        final IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_32F, 1);
-        final IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_32F, 1);
+        final Mat resized = new Mat(new Size(x, y), IPL_DEPTH_32F);
+        final Mat gray = new Mat(new Size(x, y), IPL_DEPTH_32F);
 
         log.debug("Convert to Grayscale");
-        cvConvertScale(image, gray, 1. / 255, 0);
         log.debug("Resizing image");
 
-        cvResize(gray, resized, CV_INTER_NN);
+        opencv_imgproc.resize(gray, resized, new Size(x, y));
         //log.debug("Egalisation");
-        //cvEqualizeHist(resized, resized);
+        resized.
 
         // Write gray scale resized image
          BufferedImage write = resized.getBufferedImage();
@@ -107,21 +100,4 @@ public class Treatment {
         return resized;
     }
 
-    public static void showResult(Mat img) {
-        Imgproc.resize(img, img, new Size(640, 480));
-        MatOfByte matOfByte = new MatOfByte();
-        Highgui.imencode(".jpg", img, matOfByte);
-        byte[] byteArray = matOfByte.toArray();
-        BufferedImage bufImage = null;
-        try {
-            InputStream in = new ByteArrayInputStream(byteArray);
-            bufImage = ImageIO.read(in);
-            JFrame frame = new JFrame();
-            frame.getContentPane().add(new JLabel(new ImageIcon(bufImage)));
-            frame.pack();
-            frame.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -2,7 +2,6 @@ package fr.olympicinsa.riocognized.facedetector;
 
 import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
 import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
-import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
 import fr.olympicinsa.riocognized.facedetector.exception.FaceDBException;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
@@ -15,8 +14,9 @@ import java.util.Date;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
+import static org.bytedeco.javacpp.opencv_contrib.*;
+import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.opencv_highgui.*;
 
 public class Riocognized {
 
@@ -99,13 +99,13 @@ public class Riocognized {
             "Start FaceDetector");
         try {
             FaceDetector faceDetector = new FaceDetector();
-            image = Highgui.imread(fileOutput);
+            image = imread(fileOutput);
             try {
                 //crop face
                 Mat crop = faceDetector.cropFaceToMat(image);
                 log.info("Detected " + faceDetector.getFacesDetected() + " athletes !");
                 if (faceDetector.getFacesDetected() > 0) {
-                    Highgui.imwrite(filename + "_croped.jpg", crop);
+                    imwrite(filename + "_croped.jpg", crop);
                     IplImage face = ImageConvertor.matToIplImage(crop);
                     for (int i = 0; i < 4; i++) {
                         int athlete = recognizor.predictedLabel(face);

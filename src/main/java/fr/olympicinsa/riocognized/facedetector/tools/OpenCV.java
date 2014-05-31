@@ -1,7 +1,6 @@
 package fr.olympicinsa.riocognized.facedetector.tools;
 
 import static fr.olympicinsa.riocognized.facedetector.tools.NativeLibraryLoader.loadLibraryFromJar;
-import org.opencv.core.Core;
 
 public class OpenCV {
 

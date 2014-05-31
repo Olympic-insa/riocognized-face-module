@@ -5,20 +5,32 @@
  */
 package fr.olympicinsa.riocognized.facedetector.recognition;
 
-import com.googlecode.javacv.cpp.opencv_contrib.FaceRecognizer;
-import static com.googlecode.javacv.cpp.opencv_contrib.createEigenFaceRecognizer;
-import static com.googlecode.javacv.cpp.opencv_contrib.createFisherFaceRecognizer;
-import static com.googlecode.javacv.cpp.opencv_contrib.createLBPHFaceRecognizer;
-import com.googlecode.javacv.cpp.opencv_core.IplImage;
-import com.googlecode.javacv.cpp.opencv_core.MatVector;
-import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
-import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
-
-import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
+import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
 import org.apache.log4j.Logger;
+import org.bytedeco.javacpp.opencv_contrib.FaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createEigenFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createEigenFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createEigenFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createEigenFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createEigenFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createEigenFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createEigenFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createFisherFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createFisherFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createFisherFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createFisherFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createFisherFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createFisherFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createFisherFaceRecognizer;
+import static org.bytedeco.javacpp.opencv_contrib.createLBPHFaceRecognizer;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatVector;
+import static org.bytedeco.javacpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
+import static org.bytedeco.javacpp.opencv_highgui.cvLoadImage;
+import static org.bytedeco.javacpp.opencv_highgui.imread;
 
 /**
  *
@@ -98,12 +110,12 @@ public class RioRecognizer {
         int counter = 0;
         String label;
 
-        IplImage img;
-        IplImage grayImg;
+        Mat img;
+        Mat grayImg;
 
         for (String[] face : faceDatabase.getFaces()) {
             try {
-                img = cvLoadImage(face[0], CV_LOAD_IMAGE_GRAYSCALE);
+                img = imread(face[0], CV_LOAD_IMAGE_GRAYSCALE);
                 label = face[1];
                 log.debug("Read image(" + counter + ") in " + face[0]);
                 grayImg = Treatment.beforeRecognition(img, x, y);
@@ -136,12 +148,12 @@ public class RioRecognizer {
      * @param image IplImage croped face to recognized
      * @return int of recognized Athlete id
      */
-    public int predictedLabel(IplImage image) {
+    public int predictedLabel(Mat image) {
         int result = 0;
 
         try {
             log.info("Test image is converting FittedGrey scale");
-            IplImage greyPredictImage = Treatment.beforeRecognition(image, x, y);
+            Mat greyPredictImage = Treatment.beforeRecognition(image, x, y);
             log.info("Try to predict ...");
             //result = eigenRecognizer.predict(image);
             eigenRecognizer.predict(greyPredictImage, athlete, distance);

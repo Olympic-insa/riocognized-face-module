@@ -1,30 +1,24 @@
 package fr.olympicinsa.riocognized.facedetector.detection;
 
-import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_DO_CANNY_PRUNING;
-import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_DO_ROUGH_SEARCH;
-import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_FIND_BIGGEST_OBJECT;
-import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_SCALE_IMAGE;
-import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
+import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
 import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.resize;
-import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.showResult;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import static java.lang.System.exit;
-import java.util.Date;
 import org.apache.log4j.Logger;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.core.Scalar;
-import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Point;
+import org.bytedeco.javacpp.opencv_core.Rect;
+import org.bytedeco.javacpp.opencv_core.Scalar;
+import org.bytedeco.javacpp.opencv_core.Size;
+import static org.bytedeco.javacpp.opencv_core.rectangle;
+import static org.bytedeco.javacpp.hel
+import static org.bytedeco.javacpp.opencv_highgui.imread;
+import static org.bytedeco.javacpp.opencv_highgui.imwrite;
+import static org.bytedeco.javacpp.opencv_objdetect.CV_HAAR_DO_CANNY_PRUNING;
+import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 
 public class FaceDetector {
 
@@ -72,7 +66,7 @@ public class FaceDetector {
     public int detectFaces(String imageURL, String output) {
 
         //Read image
-        Mat image = Highgui.imread(imageURL);
+        Mat image = imread(imageURL);
 
         MatOfRect faceDetections = new MatOfRect();
         frontalDetector.detectMultiScale(image, faceDetections, 1.05, 3, 0, minSize, maxSize);
@@ -81,12 +75,12 @@ public class FaceDetector {
 
         //Frame recognized athlete faces
         for (Rect rect : faceDetections.toArray()) {
-            Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
-                new Scalar(0, 255, 0));
+            rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
+                new Scalar(0, 255));
         }
 
         //Write new file
-        Highgui.imwrite(output, image);
+        imwrite(output, image);
 
         return detected;
     }
@@ -124,13 +118,13 @@ public class FaceDetector {
         this.facesDetected = detected;
         if (detected > 0) {
             for (Rect rect : faceDetections.toArray()) {
-                Core.rectangle(imageR, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
-                    new Scalar(0, 255, 0));
+                rectangle(imageR, new Point(rect.x(), rect.y()), new Point(rect.x() + rect.width(), rect.y() + rect.height()),
+                    new Scalar((double)0, (double)255));
             }
             //showResult(imageR);
             try {
                 String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
-                Highgui.imwrite(debug, imageR);
+                imwrite(debug, imageR);
                 log.info("Faces detected writed to: " + debug);
             } catch (IOException e) {
                 log.error("Can't write debug face detected image");
@@ -138,7 +132,7 @@ public class FaceDetector {
         }
 
         //Write new file
-        Highgui.imwrite(output, imageR);
+        imwrite(output, imageR);
 
         return detected;
     }
@@ -158,8 +152,8 @@ public class FaceDetector {
 
         //Frame recognized athlete faces
         for (Rect rect : faceDetections.toArray()) {
-            Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
-                new Scalar(0, 255, 0));
+            rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
+                new Scalar(0, 255));
         }
 
         //Write new bufferedImage
@@ -180,7 +174,7 @@ public class FaceDetector {
         this.facesDetected = detected;
         if (faceDetections.toArray().length > 0) {
             Rect rect = faceDetections.toArray()[0];
-            Rect rectCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
+            Rect rectCrop = new Rect(rect.x(), rect.y(), rect.width(), rect.height());
             Mat cropImage = new Mat(image, rectCrop);
             //Write new bufferedImage
             Mat grayScaled = Treatment.beforeDetection(cropImage);
@@ -224,8 +218,8 @@ public class FaceDetector {
         this.facesDetected = detected;
         if (detected > 0) {
             for (Rect rect : faceDetections.toArray()) {
-                Core.rectangle(imageR, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
-                    new Scalar(0, 255, 0));
+                rectangle(imageR, new Point(rect.x(), rect.y()), new Point(rect.x() + rect.width(), rect.y() + rect.height()),
+                    new Scalar(0, 255));
             }
             
            /*
@@ -234,7 +228,7 @@ public class FaceDetector {
             //showResult(imageR);
             try {
                 String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
-                Highgui.imwrite(debug, imageR);
+                imwrite(debug, imageR);
                 log.info("Faces detected writed to: " + debug);
             } catch (IOException e) {
                 log.error("Can't write debug face detected image");
@@ -256,7 +250,7 @@ public class FaceDetector {
                 faceRect = faceDetections.toArray()[0];
             }
 
-            Rect rectCrop = new Rect(faceRect.x, faceRect.y, faceRect.width, faceRect.height);
+            Rect rectCrop = new Rect(faceRect.x(), faceRect.y(), faceRect.width(), faceRect.height());
             Mat cropImage = new Mat(imageR, rectCrop);
             Mat grayScaled = Treatment.beforeDetection(cropImage);
             return grayScaled;
@@ -273,7 +267,7 @@ public class FaceDetector {
      * @return boolean true if detected
      */
     public boolean faceHasEyes(Rect facesArray, Mat frame) {
-        Point center = new Point(facesArray.x + facesArray.width * 0.5, facesArray.y + facesArray.height * 0.5);
+        Point center = new Point(facesArray.x + facesArray.width() * 0.5, facesArray.y() + facesArray.height * 0.5);
         Mat face = frame.clone();
         Mat faceROI = face.submat(facesArray);
         MatOfRect eyes = new MatOfRect();
@@ -282,9 +276,9 @@ public class FaceDetector {
         log.info("EyesDetector detect :" + eyes.toArray().length);
         Rect[] eyesArray = eyes.toArray();
         for (int j = 0; j < eyesArray.length; j++) {
-            Point center1 = new Point(facesArray.x + eyesArray[j].x + eyesArray[j].width * 0.5, facesArray.y + eyesArray[j].y + eyesArray[j].height * 0.5);
-            int radius = (int) Math.round((eyesArray[j].width + eyesArray[j].height) * 0.25);
-            Core.circle(face, center1, radius, new Scalar(255, 0, 0), 4, 2, 0);
+            Point center1 = new Point(facesArray.x() + eyesArray[j].x() + eyesArray[j].width() * 0.5, facesArray.y + eyesArray[j].y + eyesArray[j].height() * 0.5);
+            int radius = (int) Math.round((eyesArray[j].width() + eyesArray[j].height()) * 0.25);
+            circle(face, center1, radius, new Scalar(255, 0, 0), 4, 2, 0);
         }
         if (eyesArray.length > 0) {
             //Highgui.imwrite(DEBUG_OUTPUT_FILE + eyesArray[0].x + ".jpg", face);
