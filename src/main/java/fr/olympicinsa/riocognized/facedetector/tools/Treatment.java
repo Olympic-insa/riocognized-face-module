@@ -15,6 +15,7 @@ import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import static com.googlecode.javacv.cpp.opencv_core.cvConvertScale;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateImage;
 import static com.googlecode.javacv.cpp.opencv_core.cvCvtScale;
+import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
 import static com.googlecode.javacv.cpp.opencv_core.cvPow;
 import static com.googlecode.javacv.cpp.opencv_core.cvSize;
 import static com.googlecode.javacv.cpp.opencv_core.cvSub;
@@ -25,6 +26,7 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_NN;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_THRESH_TRUNC;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvEqualizeHist;
+import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
@@ -71,6 +73,7 @@ import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.cvtColor;
+import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.equalizeHist;
 
 /**
@@ -81,6 +84,7 @@ public class Treatment {
 
     public static Logger log = Logger.getLogger(Treatment.class);
 
+    public static CanvasFrame canvas = new CanvasFrame("Debug");
     /**
      * Images should be resized and grayscaled before eigenfaces. Then, egalized
      * its histogram
@@ -145,7 +149,6 @@ public class Treatment {
      */
     public static IplImage beforePreditionOld(opencv_core.IplImage image, int x, int y) {
 
-        //CanvasFrame canvas = new CanvasFrame("Debug");
         // Create empty image
         final IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_32F, 1);
         final IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_32F, 1);
@@ -157,6 +160,7 @@ public class Treatment {
         cvResize(gray, resized, CV_INTER_NN);
         //log.debug("Egalisation");
         //cvEqualizeHist(resized, resized);
+        //CanvasFrame canvas = new CanvasFrame("Debug");
         //canvas.showImage(resized);
         return resized;
     }
@@ -170,30 +174,29 @@ public class Treatment {
      * @param y int of new image height
      * @return IplImage of grayscale fitted image
      */
-    public static IplImage beforePrediction(opencv_core.IplImage img, int x, int y, int predict) {
+    public static IplImage beforePrediction(IplImage img, int x, int y, int predict) {
         
         IplImage gf = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_32F, 1);
-        IplImage gr = IplImage.create(img.width(),img.height(), IPL_DEPTH_8U, 1);
+        IplImage gr = IplImage.create(img.width(),img.height(), IPL_DEPTH_32F, 1);
         IplImage tr = IplImage.create(img.width(), img.height(), IPL_DEPTH_32F, 1);
-        IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_8U, 1);
+        IplImage resized = cvCreateImage(cvSize(x, y), IPL_DEPTH_32F, 1);
         IplImage b1 = IplImage.create(img.width(), img.height(), IPL_DEPTH_32F, 1);
         IplImage b2 = IplImage.create(img.width(), img.height(), IPL_DEPTH_32F, 1);
         IplImage b3 = IplImage.create(img.width(), img.height(), IPL_DEPTH_32F, 1);
-        CvArr mask = IplImage.create(0, 0, IPL_DEPTH_8U, 1);
+        CvArr mask = IplImage.create(0, 0, IPL_DEPTH_32F, 1);
 
-        gamma(img, gr, gf);
+        //gamma(img, gr, gf);
 
-        cvSmooth(gf, b1, CV_GAUSSIAN, 1);
-        cvSmooth(gf, b2, CV_GAUSSIAN, 27);
-        cvSub(b1, b2, b2, mask);
-        cvConvertScale(b2, gr, 127, 127);
-        cvEqualizeHist(gr, gr);
-        //cvConvertScale(gr, gr, 1. / 255, 0);
-        //cvThreshold(gr,tr,255,0,CV_THRESH_TRUNC);
+        //cvSmooth(gf, b1, CV_GAUSSIAN, 1);
+        //cvSmooth(gf, b2, CV_GAUSSIAN, 7);
+        //cvSub(b1, b2, b2, mask);
+        //cvConvertScale(b2, gr, 127, 127);
+        cvConvertScale(img, gr, 1. / 255, 0);
+        cvThreshold(gr,gr,255,0,CV_THRESH_TRUNC);
         cvResize(gr, resized, CV_INTER_NN);
         if (predict == 1) {
-            CanvasFrame canvas = new CanvasFrame("Debug");
-            canvas.showImage(resized);
+           canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+           canvas.showImage(resized);
         }
         return resized;
 
@@ -219,7 +222,7 @@ public class Treatment {
 
     public static void gamma(IplImage src, IplImage dst, IplImage temp) {
         cvConvertScale(src, temp, 1.0 / 255, 0);
-        cvPow(temp, temp, 0.2);
+        cvPow(temp, temp, 0.2   );
         cvConvertScale(temp, dst, 255, 0);
     }
 

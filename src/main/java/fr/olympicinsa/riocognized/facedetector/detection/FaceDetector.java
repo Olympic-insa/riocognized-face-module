@@ -203,7 +203,7 @@ public class FaceDetector {
         //hasEyes(imageR);
         log.info("FaceDetector use : " + CASCADE_FRONTAL_ALT);
         frontalDetector.detectMultiScale(imageR, faceDetections, 1.1, 3, 0
-            //| CV_HAAR_FIND_BIGGEST_OBJECT
+            | CV_HAAR_FIND_BIGGEST_OBJECT
             //|CV_HAAR_DO_ROUGH_SEARCH
             | CV_HAAR_DO_CANNY_PRUNING //| CV_HAAR_SCALE_IMAGE
             , minSize, maxSize);

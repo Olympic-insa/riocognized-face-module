@@ -1,11 +1,12 @@
 package fr.olympicinsa.riocognized.facedetector;
 
-import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
-import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
+import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
 import fr.olympicinsa.riocognized.facedetector.exception.FaceDBException;
 import fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer;
+import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import java.io.File;
 import java.io.IOException;
 import static java.lang.System.exit;
@@ -107,6 +108,9 @@ public class Riocognized {
                 if (faceDetector.getFacesDetected() > 0) {
                     Highgui.imwrite(filename + "_croped.jpg", crop);
                     IplImage face = ImageConvertor.matToIplImage(crop);
+                    CanvasFrame canvas = new CanvasFrame("Debug");
+                    canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+                    canvas.showImage(face);
                     for (int i = 0; i < 4; i++) {
                         int athlete = recognizor.predictedLabel(face);
                         System.out.println("\nAthlete recognized : " + athlete + "\n");

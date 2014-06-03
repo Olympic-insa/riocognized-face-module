@@ -11,6 +11,7 @@ import static com.googlecode.javacv.cpp.opencv_contrib.createFisherFaceRecognize
 import static com.googlecode.javacv.cpp.opencv_contrib.createLBPHFaceRecognizer;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.MatVector;
+import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
 import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
@@ -36,8 +37,8 @@ public class RioRecognizer {
     private final OpenCV opencv;
     // To scall faces
     private final int F = 2;
-    private int x = 100;
-    private int y = 100;
+    private int x = 200;
+    private int y = 200;
 
     private MatVector imagesDB;
     private int[] athletes;
@@ -92,24 +93,30 @@ public class RioRecognizer {
      * Initialize FaceRecognizer loading images stored in csv file
      */
     public void init() {
-        imagesDB = new MatVector(faceDatabase.getFaces().size());
-        athletes = new int[faceDatabase.getFaces().size()];
+        imagesDB = new MatVector(faceDatabase.getFaces().size() * 2);
+        athletes = new int[faceDatabase.getFaces().size() * 2];
 
         int counter = 0;
         String label;
 
         IplImage img;
         IplImage grayImg;
+        IplImage flipImg;
 
         for (String[] face : faceDatabase.getFaces()) {
             try {
                 img = cvLoadImage(face[0], CV_LOAD_IMAGE_GRAYSCALE);
+                flipImg = cvLoadImage(face[0], CV_LOAD_IMAGE_GRAYSCALE);
                 label = face[1];
                 log.debug("Read image(" + counter + ") in " + face[0]);
                 grayImg = Treatment.beforePrediction(img, x, y, 0);
+                flipImg = Treatment.beforePrediction(flipImg, x, y, 0);
                 imagesDB.put(counter, grayImg);
                 athletes[counter] = new Integer(label);
-
+                counter++;
+                cvFlip(grayImg, flipImg, 1);
+                imagesDB.put(counter, flipImg);
+                athletes[counter] = new Integer(label);
                 counter++;
             } catch (Exception e) {
                 log.error("Can't read image(" + counter + ") in " + face[0]);
