@@ -22,7 +22,7 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/TestImage";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/TestImage/detected6035990022364528887.jpg";
     public static String DIR_TO_RECOGNIZE = "/opt/openCV/TestImage";
     public static String DIR_TO_DB = "/opt/openCV/athleteDB/faces.csv";
 
@@ -111,7 +111,7 @@ public class Riocognized {
                     CanvasFrame canvas = new CanvasFrame("Debug");
                     canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
                     canvas.showImage(face);
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 1; i++) {
                         int athlete = recognizor.predictedLabel(face);
                         System.out.println("\nAthlete recognized : " + athlete + "\n");
                         recognizor.changeRecognizer(i);

@@ -83,8 +83,7 @@ import static org.opencv.imgproc.Imgproc.equalizeHist;
 public class Treatment {
 
     public static Logger log = Logger.getLogger(Treatment.class);
-
-    public static CanvasFrame canvas = new CanvasFrame("Debug");
+    
     /**
      * Images should be resized and grayscaled before eigenfaces. Then, egalized
      * its histogram
@@ -132,8 +131,6 @@ public class Treatment {
         log.debug("Resizing image");
 
         cvResize(gray, resized, CV_INTER_NN);
-        //log.debug("Egalisation");
-        //cvEqualizeHist(resized, resized);
 
         return resized;
     }
@@ -158,10 +155,6 @@ public class Treatment {
         log.debug("Resizing image");
 
         cvResize(gray, resized, CV_INTER_NN);
-        //log.debug("Egalisation");
-        //cvEqualizeHist(resized, resized);
-        //CanvasFrame canvas = new CanvasFrame("Debug");
-        //canvas.showImage(resized);
         return resized;
     }
 
@@ -194,10 +187,7 @@ public class Treatment {
         cvConvertScale(img, gr, 1. / 255, 0);
         cvThreshold(gr,gr,255,0,CV_THRESH_TRUNC);
         cvResize(gr, resized, CV_INTER_NN);
-        if (predict == 1) {
-           canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-           canvas.showImage(resized);
-        }
+
         return resized;
 
     }

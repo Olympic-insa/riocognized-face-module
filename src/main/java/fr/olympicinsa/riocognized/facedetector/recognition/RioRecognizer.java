@@ -9,17 +9,27 @@ import com.googlecode.javacv.cpp.opencv_contrib.FaceRecognizer;
 import static com.googlecode.javacv.cpp.opencv_contrib.createEigenFaceRecognizer;
 import static com.googlecode.javacv.cpp.opencv_contrib.createFisherFaceRecognizer;
 import static com.googlecode.javacv.cpp.opencv_contrib.createLBPHFaceRecognizer;
+import static com.googlecode.javacv.cpp.opencv_contrib.createLBPHFaceRecognizer;
+import static com.googlecode.javacv.cpp.opencv_contrib.createLBPHFaceRecognizer;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_core.MatVector;
 import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
 import static com.googlecode.javacv.cpp.opencv_highgui.CV_LOAD_IMAGE_GRAYSCALE;
 import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
-import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
-
-import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
+import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
+import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
+import static com.googlecode.javacv.cpp.opencv_highgui.cvSaveImage;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
+import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;
+import static fr.olympicinsa.riocognized.facedetector.detection.FaceDetector.DEBUG_OUTPUT_FILE;
+import static fr.olympicinsa.riocognized.facedetector.detection.FaceDetector.log;
+import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
+import org.opencv.highgui.Highgui;
 
 /**
  *
@@ -152,7 +162,13 @@ public class RioRecognizer {
             log.info("Try to predict ...");
             //result = eigenRecognizer.predict(image);
             eigenRecognizer.predict(greyPredictImage, athlete, distance);
-
+            try {
+                String debug = File.createTempFile("predicted", ".jpg").getAbsolutePath();
+                ImageIO.write(image.getBufferedImage(), "jpg", new File(debug));
+                log.info("Faces detected writed to: " + debug);
+            } catch (IOException e) {
+                log.error("Can't write debug face detected image");
+            }
             if (athlete[0] != -1) {
                 log.info("Ath:" + athlete[0]);
                 log.info("Dist :" + distance[0]);
