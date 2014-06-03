@@ -16,7 +16,7 @@ import org.opencv.highgui.Highgui;
 public class FaceCropper {
 
     public static Logger log = Logger.getLogger(FaceCropper.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/lfwDB";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/TestImage";
     public static String DIR_TO_RECOGNIZE = "/opt/openCV/testImage";
     public static int nbImage = 0;
     public static int nbFile = 0;
