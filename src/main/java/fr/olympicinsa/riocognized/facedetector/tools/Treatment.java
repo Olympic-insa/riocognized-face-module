@@ -84,7 +84,7 @@ public class Treatment {
 
     public static Logger log = Logger.getLogger(Treatment.class);
 
-    public static CanvasFrame canvas = new CanvasFrame("Debug");
+    //public static CanvasFrame canvas = new CanvasFrame("Debug");
     /**
      * Images should be resized and grayscaled before eigenfaces. Then, egalized
      * its histogram
@@ -195,8 +195,8 @@ public class Treatment {
         cvThreshold(gr,gr,255,0,CV_THRESH_TRUNC);
         cvResize(gr, resized, CV_INTER_NN);
         if (predict == 1) {
-           canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-           canvas.showImage(resized);
+           //canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+           //canvas.showImage(resized);
         }
         return resized;
 

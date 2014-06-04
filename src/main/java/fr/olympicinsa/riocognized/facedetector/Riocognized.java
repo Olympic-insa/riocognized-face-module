@@ -25,7 +25,9 @@ public class Riocognized {
     public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/TestImage";
     public static String DIR_TO_RECOGNIZE = "/opt/openCV/TestImage";
     public static String DIR_TO_DB = "/opt/openCV/athleteDB/faces.csv";
-
+    public static float right = 0;
+    public static float wrong = 0;
+    
     public static void main(String[] args) {
 
         DOMConfigurator.configure(Thread.currentThread().getContextClassLoader().getResource("log4j.xml"));
@@ -37,7 +39,7 @@ public class Riocognized {
         String db = (args.length > 1) ? args[1] : DIR_TO_DB;
         String athletePath;
         FaceDBReader faceDB;
-
+        
         String path = "/opt/openCV/test.yml";
         //Load faceDB
         try {
@@ -57,6 +59,7 @@ public class Riocognized {
             log.info("Initialize Riocognized FaceDetector");
             String param = (args.length > 0) ? args[0] : IMAGE_TO_RECOGNIZE;
             File repertoire = new File(param);
+            File repertoire2;
             String fileOutput = null;
             if (repertoire.isDirectory()) {
                 File[] list = repertoire.listFiles();
@@ -65,6 +68,15 @@ public class Riocognized {
                         fileOutput = file.getAbsolutePath();
                         String fileName = FilenameUtils.removeExtension(file.getName());
                         recognizeTest(fileOutput, fileName, recognizor);
+                    } else if (file.isDirectory()) {
+                        File[] list2 = file.listFiles();
+                        for (File file3 : list2) {
+                            if (file3.getName().matches("(.*)jpg")) {
+                                fileOutput = file3.getAbsolutePath();
+                                String fileName = FilenameUtils.removeExtension(file3.getName());
+                                recognizeTest(fileOutput, fileName, recognizor);
+                            }
+                        }
                     }
                 }
             } else {
@@ -87,6 +99,10 @@ public class Riocognized {
             log.error("Can't read/create faceDB csv");
             exit(0);
         }
+        float accuracy = right / (right+ wrong);
+        log.info("TRUE :" + right);
+        log.info("FALSE :" + wrong);
+        log.info("ACCURACY :" + accuracy);
     }
 
     public Riocognized() {
@@ -106,15 +122,19 @@ public class Riocognized {
                 Mat crop = faceDetector.cropFaceToMat(image);
                 log.info("Detected " + faceDetector.getFacesDetected() + " athletes !");
                 if (faceDetector.getFacesDetected() > 0) {
-                    Highgui.imwrite(filename + "_croped.jpg", crop);
+                    //Highgui.imwrite(filename + "_croped.jpg", crop);
                     IplImage face = ImageConvertor.matToIplImage(crop);
-                    CanvasFrame canvas = new CanvasFrame("Debug");
-                    canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-                    canvas.showImage(face);
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 1; i++) {
                         int athlete = recognizor.predictedLabel(face);
-                        System.out.println("\nAthlete recognized : " + athlete + "\n");
-                        recognizor.changeRecognizer(i);
+                        log.info("Athlete recognized : " + athlete);
+                        log.info("Image: " + fileOutput.split("_")[0]);
+                        //recognizor.changeRecognizer(i);
+                        if (fileOutput.contains(Integer.toString(athlete) + "_")) {
+                            log.info("TRUE");
+                            right++;
+                        } else {
+                            wrong++;
+                        }
                     }
                 }
             } catch (Exception e) {
