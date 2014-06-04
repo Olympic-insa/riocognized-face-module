@@ -1,6 +1,5 @@
 package fr.olympicinsa.riocognized.facedetector;
 
-import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import fr.olympicinsa.riocognized.facedetector.db.FaceDBReader;
 import fr.olympicinsa.riocognized.facedetector.detection.FaceDetector;

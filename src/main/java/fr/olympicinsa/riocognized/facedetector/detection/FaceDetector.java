@@ -8,7 +8,6 @@ import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
 import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.resize;
-import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.showResult;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -231,14 +230,13 @@ public class FaceDetector {
            /*
             * For debugging purpose. Write temp file with all detected face in image
             */
-            //showResult(imageR);
-            //try {
-                //String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
-                //Highgui.imwrite(debug, imageR);
-                //log.info("Faces detected writed to: " + debug);
-            //} catch (IOException e) {
+            try {
+                String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
+                Highgui.imwrite(debug, imageR);
+                log.info("Faces detected writed to: " + debug);
+            } catch (IOException e) {
                 log.error("Can't write debug face detected image");
-            //}
+            }
             
             /**/
             

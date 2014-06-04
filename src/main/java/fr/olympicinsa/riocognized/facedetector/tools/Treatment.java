@@ -5,7 +5,6 @@
  */
 package fr.olympicinsa.riocognized.facedetector.tools;
 
-import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.cpp.opencv_core;
 import com.googlecode.javacv.cpp.opencv_core.CvArr;
 import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32F;
@@ -49,9 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import org.apache.log4j.Logger;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -200,24 +196,6 @@ public class Treatment {
         }
         return resized;
 
-    }
-
-    public static void showResult(Mat img) {
-        Imgproc.resize(img, img, new Size(640, 480));
-        MatOfByte matOfByte = new MatOfByte();
-        Highgui.imencode(".jpg", img, matOfByte);
-        byte[] byteArray = matOfByte.toArray();
-        BufferedImage bufImage = null;
-        try {
-            InputStream in = new ByteArrayInputStream(byteArray);
-            bufImage = ImageIO.read(in);
-            JFrame frame = new JFrame();
-            frame.getContentPane().add(new JLabel(new ImageIcon(bufImage)));
-            frame.pack();
-            frame.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static void gamma(IplImage src, IplImage dst, IplImage temp) {
