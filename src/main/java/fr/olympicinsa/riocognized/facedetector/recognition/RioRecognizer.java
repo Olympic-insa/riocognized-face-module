@@ -59,7 +59,7 @@ public class RioRecognizer {
         this.faceDatabase = db;
         this.savePath = out;
         //this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
-        log.info("Create Fischer Recognizer");
+        log.info("Create Eigenfaces Recognizer");
         eigenRecognizer = createEigenFaceRecognizer();
     }
 

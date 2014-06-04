@@ -232,13 +232,13 @@ public class FaceDetector {
             * For debugging purpose. Write temp file with all detected face in image
             */
             //showResult(imageR);
-            try {
-                String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
-                Highgui.imwrite(debug, imageR);
-                log.info("Faces detected writed to: " + debug);
-            } catch (IOException e) {
+            //try {
+                //String debug = File.createTempFile(DEBUG_OUTPUT_FILE, ".jpg").getAbsolutePath();
+                //Highgui.imwrite(debug, imageR);
+                //log.info("Faces detected writed to: " + debug);
+            //} catch (IOException e) {
                 log.error("Can't write debug face detected image");
-            }
+            //}
             
             /**/
             
