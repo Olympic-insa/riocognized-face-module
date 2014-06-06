@@ -8,67 +8,21 @@ package fr.olympicinsa.riocognized.facedetector.tools;
 import com.googlecode.javacv.cpp.opencv_core;
 import com.googlecode.javacv.cpp.opencv_core.CvArr;
 import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32F;
-import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_32S;
-import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import static com.googlecode.javacv.cpp.opencv_core.cvConvertScale;
 import static com.googlecode.javacv.cpp.opencv_core.cvCreateImage;
-import static com.googlecode.javacv.cpp.opencv_core.cvCvtScale;
-import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
 import static com.googlecode.javacv.cpp.opencv_core.cvPow;
 import static com.googlecode.javacv.cpp.opencv_core.cvSize;
-import static com.googlecode.javacv.cpp.opencv_core.cvSub;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvSaveImage;
-import static com.googlecode.javacv.cpp.opencv_imgproc.CV_BGR2GRAY;
-import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_AREA;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_INTER_NN;
 import static com.googlecode.javacv.cpp.opencv_imgproc.CV_THRESH_TRUNC;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvCvtColor;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvEqualizeHist;
+
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvResize;
-import static com.googlecode.javacv.cpp.opencv_imgproc.cvSmooth;
 import static com.googlecode.javacv.cpp.opencv_imgproc.cvThreshold;
-import static fr.olympicinsa.riocognized.facedetector.recognition.RioRecognizer.log;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
 import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 import static org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY;
-import static org.opencv.imgproc.Imgproc.CV_GAUSSIAN;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
-import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.equalizeHist;
 
@@ -85,7 +39,7 @@ public class Treatment {
      * Images should be resized and grayscaled before eigenfaces. Then, egalized
      * its histogram
      *
-     * @param image Mat of image to treat
+     * @param image Mat of image to treat<
      * @return Mat of grayscale equalized image
      */
     public static Mat beforeDetection(Mat image) {
@@ -109,8 +63,7 @@ public class Treatment {
     }
 
     /**
-     * Images should be resized and grayscaled before eigenfaces. Then, egalized
-     * its histogram
+     * Simply resize and fit Image.
      *
      * @param image IplImage of byte image to fit for ACP
      * @param x int of new image width
@@ -135,7 +88,7 @@ public class Treatment {
     }
 
     /**
-     * Images should be resized and grayscaled before eigenfaces. Then, egalized
+     * DEPRECATED : Images should be resized and grayscaled before eigenfaces. Then, egalized
      * its histogram
      *
      * @param image IplImage of byte image to fit for ACP
@@ -198,6 +151,13 @@ public class Treatment {
 
     }
 
+    /**
+     * Image gamma correction.
+     *
+     * @param src IplImage of byte image to apply gamma correction
+     * @param dst IplImage where saving corrected IplImage
+     * @param temp IpImage temp
+     */
     public static void gamma(IplImage src, IplImage dst, IplImage temp) {
         cvConvertScale(src, temp, 1.0 / 255, 0);
         cvPow(temp, temp, 0.2   );

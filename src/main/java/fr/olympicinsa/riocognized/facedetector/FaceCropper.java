@@ -16,7 +16,7 @@ import org.opencv.highgui.Highgui;
 public class FaceCropper {
 
     public static Logger log = Logger.getLogger(FaceCropper.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/TestImage";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/testbench";
     public static String DIR_TO_RECOGNIZE = "/opt/openCV/testImage";
     public static int nbImage = 0;
     public static int nbFile = 0;
@@ -35,12 +35,6 @@ public class FaceCropper {
         String fileOutput = null;
         if (repertoire.isDirectory()) {
             iterRepertoire(repertoire, 0, 2);
-//            for (File file : list) {
-//                if (file.getName().matches("(.*)jpg")) {
-//                    String fileName = FilenameUtils.removeExtension(file.getAbsolutePath());
-//                    crop(fileOutput, fileName);
-//                }
-//            }
         } else {
             String imageParam = IMAGE_TO_RECOGNIZE;
             File f = repertoire;

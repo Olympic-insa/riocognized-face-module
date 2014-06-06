@@ -1,9 +1,7 @@
 package fr.olympicinsa.riocognized.facedetector.detection;
 
 import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_DO_CANNY_PRUNING;
-import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_DO_ROUGH_SEARCH;
 import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_FIND_BIGGEST_OBJECT;
-import static com.googlecode.javacv.cpp.opencv_objdetect.CV_HAAR_SCALE_IMAGE;
 import fr.olympicinsa.riocognized.facedetector.tools.OpenCV;
 import fr.olympicinsa.riocognized.facedetector.tools.ImageConvertor;
 import fr.olympicinsa.riocognized.facedetector.tools.Treatment;
@@ -11,8 +9,6 @@ import static fr.olympicinsa.riocognized.facedetector.tools.Treatment.resize;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import static java.lang.System.exit;
-import java.util.Date;
 import org.apache.log4j.Logger;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -22,7 +18,6 @@ import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
 public class FaceDetector {

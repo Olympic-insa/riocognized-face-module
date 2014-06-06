@@ -37,8 +37,8 @@ public class RioRecognizer {
     private final OpenCV opencv;
     // To scall faces
     private final int F = 2;
-    private int x = 200;
-    private int y = 200;
+    private int x = 100;
+    private int y = 100;
 
     private MatVector imagesDB;
     private int[] athletes;
@@ -60,7 +60,7 @@ public class RioRecognizer {
         this.savePath = out;
         //this.eigenRecognizer = createEigenFaceRecognizer(EIGEN_SIZE, THREASHOLD);
         log.info("Create Eigenfaces Recognizer");
-        eigenRecognizer = createEigenFaceRecognizer();
+        eigenRecognizer = createLBPHFaceRecognizer(2, 8, 8, 8, 200);
     }
 
     /**
@@ -109,8 +109,8 @@ public class RioRecognizer {
                 flipImg = cvLoadImage(face[0], CV_LOAD_IMAGE_GRAYSCALE);
                 label = face[1];
                 log.debug("Read image(" + counter + ") in " + face[0]);
-                grayImg = Treatment.beforePrediction(img, x, y, 0);
-                flipImg = Treatment.beforePrediction(flipImg, x, y, 0);
+                grayImg = Treatment.beforePrediction(img, getX(), getY(), 0);
+                flipImg = Treatment.beforePrediction(flipImg, getX(), getY(), 0);
                 imagesDB.put(counter, grayImg);
                 athletes[counter] = new Integer(label);
                 counter++;
@@ -134,7 +134,7 @@ public class RioRecognizer {
             init();
         }
         log.info("Train FaceRecognizer ...");
-        eigenRecognizer.train(imagesDB, athletes);
+        getEigenRecognizer().train(imagesDB, athletes);
     }
 
     /**
@@ -148,10 +148,10 @@ public class RioRecognizer {
 
         try {
             log.info("Test image is converting FittedGrey scale");
-            IplImage greyPredictImage = Treatment.beforePrediction(image, x, y, 1);
+            IplImage greyPredictImage = Treatment.beforePrediction(image, getX(), getY(), 1);
             log.info("Try to predict ...");
             //result = eigenRecognizer.predict(image);
-            eigenRecognizer.predict(greyPredictImage, athlete, distance);
+            getEigenRecognizer().predict(greyPredictImage, athlete, distance);
 
             if (athlete[0] != -1) {
                 log.info("Ath:" + athlete[0]);
@@ -172,7 +172,7 @@ public class RioRecognizer {
      * Save Eigenfaces value and FaceRecognizer config to yml file
      */
     public void save() {
-        eigenRecognizer.save(savePath);
+        getEigenRecognizer().save(savePath);
         log.info("Face Recognizer saved to" + savePath);
     }
 
@@ -181,7 +181,7 @@ public class RioRecognizer {
      * @param path String of path to saved FaceRecognizer
      */
     public void load(String path) {
-        eigenRecognizer.load(path);
+        getEigenRecognizer().load(path);
         log.info("Face Recognizer loaded from " + path);
     }
 
@@ -209,5 +209,26 @@ public class RioRecognizer {
         } else {
             return null;
         }
+    }
+
+    /**
+     * @return the x
+     */
+    public int getX() {
+        return x;
+    }
+
+    /**
+     * @return the y
+     */
+    public int getY() {
+        return y;
+    }
+
+    /**
+     * @return the eigenRecognizer
+     */
+    public FaceRecognizer getEigenRecognizer() {
+        return eigenRecognizer;
     }
 }

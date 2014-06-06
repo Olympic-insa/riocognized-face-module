@@ -11,8 +11,14 @@ import java.io.IOException;
 import static java.lang.System.exit;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.opencv.core.Mat;
@@ -21,16 +27,24 @@ import org.opencv.highgui.Highgui;
 public class Riocognized {
 
     public static Logger log = Logger.getLogger(Riocognized.class);
-    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/TestImage";
+    public static String IMAGE_TO_RECOGNIZE = "/opt/openCV/testbench";
     public static String DIR_TO_RECOGNIZE = "/opt/openCV/TestImage";
     public static String DIR_TO_DB = "/opt/openCV/athleteDB/faces.csv";
-    public static float right = 0;
-    public static float wrong = 0;
+    public static double SEUIL = 85;
+    public static double right = 0;
+    public static double wrong = 0;
+    public static double notrec = 0;
+    public static HashMap<String,double[]> athletes = new HashMap<>();
+    public static List<Double> precisionTrue = new ArrayList<>();
+    public static List<Double> precisionFalse = new ArrayList<>();
     
     public static void main(String[] args) {
 
         DOMConfigurator.configure(Thread.currentThread().getContextClassLoader().getResource("log4j.xml"));
-
+        athletes.put("207", new double[]{0,0});
+        athletes.put("1", new double[]{0,0});
+        athletes.put("218", new double[]{0,0});
+        athletes.put("376", new double[]{0,0});
         log.info("Demarrage de Riocognized");
         DateFormat dateFormat = new SimpleDateFormat("hhmmss-dd-MM-yy");
         Date date = new Date();
@@ -52,8 +66,10 @@ public class Riocognized {
             recognizor.init();
             log.info("Train Recognizer");
             recognizor.train();
-            log.info("Save Recognizer");
+            log.info("Load Recognizer");
+            //recognizor.load(path);
             recognizor.save();
+            
 
             log.info("Initialize Riocognized FaceDetector");
             String param = (args.length > 0) ? args[0] : IMAGE_TO_RECOGNIZE;
@@ -98,10 +114,27 @@ public class Riocognized {
             log.error("Can't read/create faceDB csv");
             exit(0);
         }
-        float accuracy = right / (right+ wrong);
+        double precision = right / (right+ wrong);
+        double accuracy = right / (right+ wrong + notrec);
+        log.info("#############################");
+        log.info("#---------Results-----------#");
         log.info("TRUE :" + right);
         log.info("FALSE :" + wrong);
+        log.info("NOTREC :" + notrec);
+        log.info("PRECISION :" + precision);
         log.info("ACCURACY :" + accuracy);
+        Set listAthletes = athletes.keySet();
+        Iterator it = listAthletes.iterator();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            double[] stat = athletes.get(key);
+            double occ = stat[1]/stat[0];
+            log.info("Athlete "+key +"- Nb: "+stat[0]+" - Reco: " + stat[1] + " - Occuracy : "+occ);
+        }
+        log.info("Precision True - MOY: " + moyenne(precisionTrue) + " - VAR:" + var(precisionTrue) + 
+            " - EC:" + ec(precisionTrue));
+        log.info("Precision False - MOY: " + moyenne(precisionFalse) + " - VAR:" + var(precisionFalse) + 
+            " - EC:" + ec(precisionFalse));
     }
 
     public Riocognized() {
@@ -126,13 +159,26 @@ public class Riocognized {
                     for (int i = 0; i < 1; i++) {
                         int athlete = recognizor.predictedLabel(face);
                         log.info("Athlete recognized : " + athlete);
-                        log.info("Image: " + fileOutput.split("_")[0]);
+                        log.info("Image: " + filename.split("_")[0]);
+                        double[] nbAth = athletes.get(filename.split("_")[0]);
+                        nbAth[0]++;
                         //recognizor.changeRecognizer(i);
-                        if (fileOutput.contains(Integer.toString(athlete) + "_")) {
-                            log.info("TRUE");
-                            right++;
+                        if ((double)recognizor.getPrecision()[0] < SEUIL) {
+                            if (fileOutput.contains(Integer.toString(athlete) + "_")) {
+                                log.info("TRUE");
+                                nbAth[1]++;
+                                precisionTrue.add((double)recognizor.getPrecision()[0]);
+                                right++;
+                            } else {
+                                log.info("FALSE");
+                                wrong++;
+                                precisionFalse.add((double)recognizor.getPrecision()[0]);
+                            }
+                            athletes.put(filename.split("_")[0], nbAth);
                         } else {
-                            wrong++;
+                            log.info("NOT REC");
+                            precisionFalse.add((double)recognizor.getPrecision()[0]);
+                            notrec++;
                         }
                     }
                 }
@@ -146,5 +192,36 @@ public class Riocognized {
             e.printStackTrace();
         }
 
+    }
+    
+    public static double moyenne(List list) {
+        Iterator it = list.iterator();
+        double tot = 0d;
+        while (it.hasNext()) {
+            double val = (double) it.next();
+            tot = tot + val;
+        }
+        return tot / list.size();
+    }
+    
+    public static double var(List list) {
+        Variance var = new Variance();
+        int i = 0;
+        Iterator it = list.iterator();
+        double moy = moyenne(list);
+        double [] values = new double[list.size()];
+
+        while (it.hasNext()) {
+            double val = (double) it.next();
+            values[i] = val;
+            i++;
+        }
+                
+        return var.evaluate(values, moy);
+        
+    }
+    
+    public static double ec(List list) {
+        return Math.sqrt(var(list));
     }
 }
